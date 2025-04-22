@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from datetime import datetime, timezone
 from flask import Flask, jsonify, request
 from fetch_posts import fetch_reddit_posts, reddit
@@ -10,6 +11,16 @@ import json
 
 app = Flask(__name__)
 CORS(app)
+=======
+from flask import Flask, jsonify, request
+from fetch_posts import fetch_reddit_posts, reddit
+from dotenv import load_dotenv
+import os
+import psycopg2
+import psycopg2.extras
+
+app = Flask(__name__)
+>>>>>>> dcb8661 (sec commit)
 
 DB_CONFIG = {
     'host': os.getenv('DB_HOST'),
@@ -20,6 +31,7 @@ DB_CONFIG = {
 }
 
 def get_db_connection():
+<<<<<<< HEAD
     print("Creating DB connection...")
     return psycopg2.connect(**DB_CONFIG)
 
@@ -57,6 +69,10 @@ def get_coins():
     print(f"Fetched {len(coins)} coins")
     return coins
 
+=======
+    return psycopg2.connect(**DB_CONFIG)
+
+>>>>>>> dcb8661 (sec commit)
 @app.route("/reddit_posts", methods=["POST"])
 def reddit_posts():
     data = request.get_json()
@@ -65,6 +81,7 @@ def reddit_posts():
     if not isinstance(limit, int) or limit < 1 or limit > 100:
         return {"status": "error", "message": "Limit must be an integer between 1 and 100."}, 400
 
+<<<<<<< HEAD
     print(f"Fetching {limit} Reddit posts...")
     coins = get_coins()
     print("Fetched coins!", coins)
@@ -73,6 +90,11 @@ def reddit_posts():
     return jsonify(posts)
 
 
+=======
+    posts = fetch_reddit_posts(limit=limit)
+    return jsonify(posts)
+
+>>>>>>> dcb8661 (sec commit)
 @app.route("/reddit_status", methods=["GET"])
 def reddit_status():
     try:
@@ -81,6 +103,7 @@ def reddit_status():
     except Exception as e:
         return {"status": "error", "message": str(e)}, 401
 
+<<<<<<< HEAD
 @app.route('/news', methods=['POST'])
 def get_filtered_news():
     data = request.get_json(force=True) or {}
@@ -134,15 +157,61 @@ def get_filtered_news():
                 "newsdatetime":  row["newsdatetime"].strftime("%Y-%m-%dT%H:%M:%SZ")
             }
             for row in rows
+=======
+@app.route('/news', methods=['GET'])
+def get_filtered_news():
+    currency_code = request.args.get('currency_code', default=None)
+    start_date = request.args.get('start_date') or '2017-09-01'
+    end_date = request.args.get('end_date') or '2025-01-31'
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        # Build base query
+        base_query = """
+                SELECT cn.id, cn.title, cn.url, cn.score, cn.newsdatetime
+                FROM crypto_news cn
+                JOIN news_currency nc ON cn.id = nc.newsid
+                JOIN currency c ON nc.currencyid = c.id
+                WHERE cn.newsdatetime >= %s AND cn.newsdatetime <= %s
+            """
+
+        params = [start_date, end_date]
+
+        # Add currency_code filter if provided
+        if currency_code:
+            base_query += " AND c.code = %s"
+            params.append(currency_code)
+
+        base_query += " ORDER BY cn.newsdatetime DESC"
+
+        cur.execute(base_query, params)
+        rows = cur.fetchall()
+
+        results = [
+            {
+                "id": row["id"],
+                "title": row["title"],
+                "url": row["url"],
+                "score": row["score"],
+                "newsdatetime": row["newsdatetime"].strftime("%Y-%m-%d %H:%M:%S")
+            } for row in rows
+>>>>>>> dcb8661 (sec commit)
         ]
 
         cur.close()
         conn.close()
+<<<<<<< HEAD
         return jsonify(articles)
+=======
+        return jsonify(results)
+>>>>>>> dcb8661 (sec commit)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+<<<<<<< HEAD
 COINS = [
     {"id": 1, "code": "BTC", "subreddit": "Bitcoin"},
     {"id": 2, "code": "ETH", "subreddit": "ethereum"},
@@ -377,3 +446,8 @@ def test_insert():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(debug=False, host='0.0.0.0', port=port)
+=======
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=False, host='0.0.0.0', port=port)
+>>>>>>> dcb8661 (sec commit)

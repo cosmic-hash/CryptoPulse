@@ -2,8 +2,13 @@ import json
 import csv
 
 # File paths
+<<<<<<< HEAD
 json_file = "output.json"
 csv_file = "scores.csv"
+=======
+json_file = "../output.json"
+csv_file = "../scores.csv"
+>>>>>>> dcb8661 (sec commit)
 
 # Load JSON data
 with open(json_file, "r") as f:

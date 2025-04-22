@@ -27,3 +27,15 @@ def get_para_sentiments(paragraphs):
         para_sentiments.append(avg_para_sentiment)
 
     return para_sentiments
+<<<<<<< HEAD
+=======
+
+
+
+#HEERA MENON 
+import requests
+
+def get_hfbert_sentiment(text):
+    response = requests.post('http://localhost:5000/api/hfbert/sentiment', json={'text': text})
+    return response.json()
+>>>>>>> dcb8661 (sec commit)

@@ -1,5 +1,6 @@
 import json
 import psycopg2
+
 from flask import Flask, request, jsonify, render_template
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
@@ -26,6 +27,11 @@ firebase_app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 
+json_creds = json.loads(os.environ['FIREBASE_CREDS'])
+cred = credentials.Certificate(json_creds)
+firebase_app = firebase_admin.initialize_app(cred)
+db = firestore.client()
+
 # Authentication decorator
 def login_required(f):
     @wraps(f)
@@ -48,11 +54,9 @@ def login_required(f):
 
     return decorated_function
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 # Route to handle Google Sign-In and user creation/update
 @app.route('/api/auth/google', methods=['POST'])
@@ -288,6 +292,9 @@ def check_alerts():
     }), 200
 
 
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=False, host='0.0.0.0', port=port)
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(debug=False, host='0.0.0.0', port=port)

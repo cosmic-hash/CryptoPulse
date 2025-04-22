@@ -1,4 +1,8 @@
 .env
 crypto-pulse-76003-firebase-adminsdk-fbsvc-79173e1f99.json
+<<<<<<< HEAD
 templates
 requirements.txt
+=======
+templates/config.js
+>>>>>>> dcb8661 (sec commit)

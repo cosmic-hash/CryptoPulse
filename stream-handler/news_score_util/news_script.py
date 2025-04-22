@@ -2,8 +2,13 @@ import json
 import requests
 
 # --- File paths ---
+<<<<<<< HEAD
 input_file = "news.json"
 output_file = "output.json"
+=======
+input_file = "../crypto_news_input.json"
+output_file = "../output.json"
+>>>>>>> dcb8661 (sec commit)
 
 # --- Load input JSON ---
 with open(input_file, "r") as f:

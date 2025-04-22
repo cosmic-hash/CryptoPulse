@@ -2,7 +2,11 @@ import json
 import psycopg2
 
 # --- Load Scored Data ---
+<<<<<<< HEAD
 with open("output.json", "r") as f:
+=======
+with open("../output.json", "r") as f:
+>>>>>>> dcb8661 (sec commit)
     scored_data = json.load(f)
 
 # --- PostgreSQL DB Connection ---
@@ -28,4 +32,8 @@ for item in scored_data:
 conn.commit()
 cur.close()
 conn.close()
+<<<<<<< HEAD
 print("Database updated successfully.")
+=======
+print("Database updated successfully.")
+>>>>>>> dcb8661 (sec commit)

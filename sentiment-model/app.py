@@ -1,10 +1,14 @@
 import os
-
 from flask import Flask, jsonify, request
 
+# BERT header
+from hfBERT.model import HFBertSentimentAnalyzer
 from views import get_para_sentiments, get_sentence_sentiments
 
 app = Flask(__name__)
+
+# Initialize the sentiment analyzer
+hf_bert_analyzer = HFBertSentimentAnalyzer()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -37,6 +41,20 @@ def sentence_sentiment_analyze():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/hfbert/sentiment', methods=['POST'])
+def hfbert_sentiment():
+    try:
+        data = request.json
+        text = data.get('text', '')
+        if not text:
+            return jsonify({"error": "Input must be a non-empty string"}), 400
+        
+        sentiment_class = hf_bert_analyzer.analyze_sentiment(text)
+        return jsonify({'sentiment_class': sentiment_class})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=True, host='0.0.0.0', port=port)
