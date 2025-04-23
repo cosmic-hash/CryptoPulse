@@ -48,12 +48,12 @@ hf_bert_analyzer = HFBertSentimentAnalyzer()
 def hfbert_sentiment():
     try:
         data = request.json
-        text = data.get('text', '')
-        if not text:
-            return jsonify({"error": "Input must be a non-empty string"}), 400
+        texts = data.get('texts', [])  
+        if not isinstance(texts, list) or not all(isinstance(item, str) for item in texts):
+            return jsonify({"error": "Input must be a list of non-empty strings"}), 400
         
-        sentiment_class = hf_bert_analyzer.analyze_sentiment(text)
-        return jsonify({'sentiment_class': sentiment_class})
+        sentiment_classes = hf_bert_analyzer.analyze_sentiment(texts)
+        return jsonify({'sentiment_classes': sentiment_classes})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -61,7 +61,6 @@ def hfbert_sentiment():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(debug=True, host='0.0.0.0', port=port)
-
 
 
 
