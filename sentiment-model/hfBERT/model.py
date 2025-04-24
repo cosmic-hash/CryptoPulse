@@ -12,3 +12,4 @@ class HFBertSentimentAnalyzer:
             outputs = self.model(**inputs)
         predictions = torch.argmax(outputs.logits, dim=-1)
         return predictions.tolist()  
+    
