@@ -41,11 +41,15 @@ def sentence_sentiment_analyze():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+<<<<<<< HEAD
+=======
+hf_bert_analyzer = HFBertSentimentAnalyzer()
+
+>>>>>>> 7f0a579 (Update app logic in sentiment module)
 @app.route('/api/hfbert/sentiment', methods=['POST'])
 def hfbert_sentiment():
     try:
-        data = request.json
-        texts = data.get('texts', [])  
+        texts = request.get_json() 
         if not isinstance(texts, list) or not all(isinstance(item, str) for item in texts):
             return jsonify({"error": "Input must be a list of non-empty strings"}), 400
         
