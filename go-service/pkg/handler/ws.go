@@ -27,8 +27,8 @@ var currencyCodeMap = func() map[int]string {
 }()
 
 // WSHandler streams pre-aggregated sentiment in 5-minute buckets.
-// Supports both query-param and JSON overrides.
-// If no "tokens" key is sent, it will send all coins.
+// Defaults to last 1h on connect, can override window & tokens via JSON frames,
+// and also handles ping/pong.
 func WSHandler(w http.ResponseWriter, r *http.Request) {
     conn, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
@@ -38,123 +38,64 @@ func WSHandler(w http.ResponseWriter, r *http.Request) {
     defer conn.Close()
     log.Println("[WS] connection established")
 
-    // --- initial overrides from query params ---
+    // — ping/pong at protocol level —
+    conn.SetPingHandler(func(appData string) error {
+        log.Println("[WS] received PING, replying PONG")
+        return conn.WriteMessage(websocket.PongMessage, []byte(appData))
+    })
+    conn.SetPongHandler(func(appData string) error {
+        log.Println("[WS] received PONG:", appData)
+        return nil
+    })
+
+    // — initial tokens filter from query-param —
     var (
         filterCodes []string
         useFilter   bool
-        fixedStart  time.Time
-        fixedEnd    time.Time
-        useFixed    bool
     )
     if tok := r.URL.Query().Get("tokens"); tok != "" {
         filterCodes = strings.Split(tok, ",")
-        useFilter = true
+        useFilter   = true
         log.Printf("[WS] initial token filter: %v", filterCodes)
     }
-    if s := r.URL.Query().Get("start_time"); s != "" {
-        if t, err := time.Parse(time.RFC3339, s); err == nil {
-            fixedStart = t.UTC()
-            useFixed = true
-            log.Printf("[WS] initial start_time override: %s", fixedStart)
+
+    // Reader loop: each JSON frame triggers one send
+    for {
+        var msg struct {
+            StartTime string    `json:"start_time"`
+            EndTime   string    `json:"end_time"`
+            Tokens    *[]string `json:"tokens"`
         }
-    }
-    if e := r.URL.Query().Get("end_time"); e != "" {
-        if t, err := time.Parse(time.RFC3339, e); err == nil {
-            fixedEnd = t.UTC()
-            useFixed = true
-            log.Printf("[WS] initial end_time override: %s", fixedEnd)
-        }
-    }
-
-    // channel to trigger immediate refresh
-    overrideCh := make(chan struct{}, 1)
-
-    // --- reader goroutine for JSON control frames ---
-    go func() {
-        for {
-            var msg struct {
-                Tokens    *[]string `json:"tokens"`
-                StartTime *string   `json:"start_time"`
-                EndTime   *string   `json:"end_time"`
-            }
-            if err := conn.ReadJSON(&msg); err != nil {
-                log.Println("[WS] read JSON error:", err)
-                close(overrideCh)
-                return
-            }
-            log.Printf("[WS] got override frame: %+v", msg)
-
-            // tokens logic: nil = no key, empty slice = explicit empty
-            if msg.Tokens != nil {
-                filterCodes = *msg.Tokens
-                useFilter = true
-                log.Printf("[WS] updated token filter: %v", filterCodes)
-            } else {
-                useFilter = false
-                log.Println("[WS] no tokens key → sending ALL coins")
-            }
-
-            // start_time override
-            if msg.StartTime != nil {
-                if t, err := time.Parse(time.RFC3339, *msg.StartTime); err == nil {
-                    fixedStart = t.UTC()
-                    useFixed = true
-                    log.Printf("[WS] updated start_time: %s", fixedStart)
-                } else {
-                    log.Printf("[WS] bad start_time %q: %v", *msg.StartTime, err)
-                }
-            }
-            // end_time override
-            if msg.EndTime != nil {
-                if t, err := time.Parse(time.RFC3339, *msg.EndTime); err == nil {
-                    fixedEnd = t.UTC()
-                    useFixed = true
-                    log.Printf("[WS] updated end_time: %s", fixedEnd)
-                } else {
-                    log.Printf("[WS] bad end_time %q: %v", *msg.EndTime, err)
-                }
-            }
-
-            // fire an immediate refresh
-            select {
-            case overrideCh <- struct{}{}:
-            default:
-            }
-        }
-    }()
-
-    // helper: generate every 5-min tick between start and end
-    makeTimeline := func(start, end time.Time) []time.Time {
-        start = start.Truncate(5 * time.Minute)
-        var series []time.Time
-        for t := start; !t.After(end); t = t.Add(5 * time.Minute) {
-            series = append(series, t)
-        }
-        return series
-    }
-
-    // core send logic
-    send := func() {
-        // pick window
-        var start, end time.Time
-        if useFixed {
-            start, end = fixedStart, fixedEnd
-            log.Printf("[WS] using fixed window %s → %s", start, end)
-        } else {
-            end = time.Now().UTC()
-            start = end.Add(-1 * time.Hour)
-            log.Printf("[WS] using default window %s → %s", start, end)
-        }
-
-        // fetch aggregated rows
-        aggs, err := db.FetchAggregatedSentimentsBetween(start, end)
-        if err != nil {
-            log.Printf("[WS] fetch error: %v", err)
+        if err := conn.ReadJSON(&msg); err != nil {
+            log.Println("[WS] read JSON error or closed:", err)
             return
         }
-        log.Printf("[WS] fetched %d rows", len(aggs))
+        // Parse window
+        start, err1 := time.Parse(time.RFC3339, msg.StartTime)
+        end,   err2 := time.Parse(time.RFC3339, msg.EndTime)
+        if err1 != nil || err2 != nil || !start.Before(end) {
+            log.Printf("[WS] invalid window: %q → %q", msg.StartTime, msg.EndTime)
+            conn.WriteJSON(map[string]string{"error": "invalid start_time or end_time"})
+            continue
+        }
+        log.Printf("[WS] window overridden: %s → %s", start, end)
 
-        // bucket by minute → map[timestamp][code] = score
+        // Tokens override
+        if msg.Tokens != nil {
+            filterCodes = *msg.Tokens
+            useFilter   = true
+            log.Printf("[WS] tokens overridden: %v", filterCodes)
+        }
+
+        // Fetch aggregates
+        aggs, err := db.FetchAggregatedSentimentsBetween(start.UTC(), end.UTC())
+        if err != nil {
+            log.Printf("[WS] db fetch error: %v", err)
+            conn.WriteJSON(map[string]string{"error": "db fetch failed"})
+            continue
+        }
+
+        // Bucket by minute
         buckets := make(map[time.Time]map[string]float64)
         for _, a := range aggs {
             ts := a.WindowStart.UTC().Truncate(time.Minute)
@@ -168,10 +109,7 @@ func WSHandler(w http.ResponseWriter, r *http.Request) {
             buckets[ts][code] = a.SentimentScore
         }
 
-        // build full timeline
-        timeline := makeTimeline(start, end)
-
-        // determine which codes to include
+        // Decide which coins to include
         var codes []string
         if useFilter {
             codes = filterCodes
@@ -182,7 +120,14 @@ func WSHandler(w http.ResponseWriter, r *http.Request) {
         }
         sort.Strings(codes)
 
-        // assemble payload
+        // Build 5-min timeline
+        timeline := []time.Time{}
+        t0 := start.Truncate(5 * time.Minute)
+        for t := t0; !t.After(end); t = t.Add(5 * time.Minute) {
+            timeline = append(timeline, t)
+        }
+
+        // Assemble payload
         resp := make([]map[string]interface{}, 0, len(timeline))
         for _, ts := range timeline {
             data := make(map[string]float64, len(codes))
@@ -190,36 +135,17 @@ func WSHandler(w http.ResponseWriter, r *http.Request) {
             for _, code := range codes {
                 data[code] = bucket[code] // zero if missing
             }
-            log.Printf("[WS] bucket %s → %+v", ts.Format(time.RFC3339), data)
             resp = append(resp, map[string]interface{}{
                 "time":  ts.Format("2006-01-02T15:04Z"),
                 "coins": data,
             })
         }
 
-        // send JSON
+        // Send back
         if err := conn.WriteJSON(resp); err != nil {
             log.Println("[WS] write error:", err)
-        } else {
-            log.Printf("[WS] sent %d buckets", len(resp))
+            return
         }
-    }
-
-    // initial send, then every minute, plus immediate on override
-    send()
-    ticker := time.NewTicker(1 * time.Minute)
-    defer ticker.Stop()
-
-    for {
-        select {
-        case <-ticker.C:
-            send()
-        case _, ok := <-overrideCh:
-            if !ok {
-                return
-            }
-            log.Println("[WS] override fired — immediate send")
-            send()
-        }
+        log.Printf("[WS] sent %d buckets", len(resp))
     }
 }
