@@ -4,6 +4,7 @@ import (
     "context"
 	"google.golang.org/api/iterator"
     "github.com/cosmic-hash/CryptoPulse/pkg/firebase"
+	"cloud.google.com/go/firestore"
 	"log"
 	"github.com/google/uuid"
 	
@@ -79,4 +80,18 @@ func DeleteSubscription(ctx context.Context, docID string) error {
     }
     log.Printf("[DeleteSubscription] successfully deleted %q", docID)
     return nil
+}
+// UpdateSubscription updates the coinId & threshold on an existing subscription doc.
+func UpdateSubscription(ctx context.Context, docID string, coinID int, threshold float64) error {
+    fs := firebase.Client()
+    _, err := fs.Collection("alert_subscriptions").
+        Doc(docID).
+        Set(ctx, map[string]interface{}{
+            "coinId":    coinID,
+            "threshold": threshold,
+        }, firestore.MergeAll)  // only merge these two fields
+    if err != nil {
+        log.Printf("[UpdateSubscription] failed to update doc %q: %v", docID, err)
+    }
+    return err
 }

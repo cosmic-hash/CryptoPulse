@@ -5,34 +5,46 @@ import (
     "log"
     "net/http"
     "os"
-	"strings"
+    "strings"
 
     "github.com/joho/godotenv"
 
     "github.com/cosmic-hash/CryptoPulse/pkg/config"
     "github.com/cosmic-hash/CryptoPulse/pkg/db"
+    "github.com/cosmic-hash/CryptoPulse/pkg/firebase"
     handlers "github.com/cosmic-hash/CryptoPulse/pkg/handler"
-	"github.com/cosmic-hash/CryptoPulse/pkg/firebase"
-	openai "github.com/cosmic-hash/CryptoPulse/pkg/openai"
-	 
+    openai "github.com/cosmic-hash/CryptoPulse/pkg/openai"
 )
 
+// withCORS wraps your handler to support CORS
+func withCORS(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // allow your frontend origin (or "*" for all)
+        w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-User-ID")
+
+        // preflight
+        if r.Method == http.MethodOptions {
+            w.WriteHeader(http.StatusOK)
+            return
+        }
+        next.ServeHTTP(w, r)
+    })
+}
+
 func main() {
-    // 1) Load .env if it exists
+    // 1) Load .env if present
     if err := godotenv.Load(); err != nil {
         log.Println("No .env file found, falling back to env vars")
     }
-	// DEBUG: verify the key is there
-    //log.Printf("→ OPENAI_API_KEY=%q", os.Getenv("OPENAI_API_KEY"))
 
-    // 1.a) Initialize the OpenAI client now that the .env is loaded
+    // 1.a) Initialize OpenAI client
     openai.InitClient()
-    // 1.a) Debug: print out the DATABASE_URL you're using
-    // log.Printf("→ DATABASE_URL=%q", os.Getenv("DATABASE_URL"))
 
-    // 2) Init DB (will log fatal if it still can’t connect)
+    // 2) Init Database & Firebase
     db.InitDB()
-	firebase.Init()
+    firebase.Init()
 
     // 3) Load question mapping
     mappingPath := os.Getenv("QUESTION_MAPPING_FILE")
@@ -47,73 +59,57 @@ func main() {
         log.Fatalf("Error parsing mapping file: %v", err)
     }
 
-// // /alerts → both list (GET) and create (POST)
-// http.HandleFunc("/alerts", func(w http.ResponseWriter, r *http.Request) {
-// 	switch r.Method {
-// 	case http.MethodGet:
-// 		handlers.ListAlertsHandler(w, r)
-// 	case http.MethodPost:
-// 		handlers.CreateAlertHandler(w, r)
-// 	default:
-// 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-// 	}
-// })
+    // 4) Wire up routes on a new mux
+    mux := http.NewServeMux()
 
-// /alerts/{id} → delete only
-http.HandleFunc("/alerts/", func(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	// the path is "/alerts/{id}"
-	// so everything after "/alerts/" is the id
-	id := strings.TrimPrefix(r.URL.Path, "/alerts/")
-	// inject into the Request as a query param for simplicity
-	q := r.URL.Query()
-	q.Set("id", id)
-	r.URL.RawQuery = q.Encode()
+    // 4.a) /alerts → list & create
+    mux.HandleFunc("/alerts", func(w http.ResponseWriter, r *http.Request) {
+        switch r.Method {
+        case http.MethodGet:
+            handlers.ListAlertsHandler(w, r)
+        case http.MethodPost:
+            handlers.CreateAlertHandler(w, r)
+        default:
+            http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        }
+    })
 
-	handlers.DeleteAlertHandler(w, r)
-})
-
-http.HandleFunc("/alerts", func(w http.ResponseWriter, r *http.Request) {
-    switch r.Method {
-    case http.MethodGet:
-        handlers.ListAlertsHandler(w, r)
-
-    case http.MethodPost:
-        handlers.CreateAlertHandler(w, r)
-
-    case http.MethodDelete:
-        // we’ll delete by coinId query param, not Firestore ID
-        coinStr := r.URL.Query().Get("coinId")
-        if coinStr == "" {
-            http.Error(w, "coinId query required", http.StatusBadRequest)
+    // 4.b) /alerts/{id} → update & delete
+    mux.HandleFunc("/alerts/", func(w http.ResponseWriter, r *http.Request) {
+        // strip the prefix to get the alert doc ID
+        id := strings.TrimPrefix(r.URL.Path, "/alerts/")
+        if id == "" {
+            http.Error(w, "Missing alert ID", http.StatusBadRequest)
             return
         }
-        // inject coinId into the request context so your handler can read it:
+        // inject into query for handlers to read
         q := r.URL.Query()
-        q.Set("coinId", coinStr)
+        q.Set("id", id)
         r.URL.RawQuery = q.Encode()
 
-        handlers.DeleteAlertHandler(w, r)
+        switch r.Method {
+        case http.MethodPut:
+            handlers.UpdateAlertHandler(w, r)
+        case http.MethodDelete:
+            handlers.DeleteAlertHandler(w, r)
+        default:
+            http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        }
+    })
 
-    default:
-        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+    // 4.c) Other core endpoints
+    mux.HandleFunc("/", handlers.HelloHandler)
+    mux.HandleFunc("/sentiment", handlers.SentimentHandler)
+    mux.HandleFunc("/ws", handlers.WSHandler)
+    mux.HandleFunc("/aggregate", handlers.AggregateHandler)
+    mux.HandleFunc("/explain", handlers.ExplainSentimentHandler)
+
+    // 5) Wrap with CORS and start server
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080"
     }
-})
-
-    // 4) Register HTTP & WebSocket handlers
-    http.HandleFunc("/", handlers.HelloHandler)
-    http.HandleFunc("/sentiment", handlers.SentimentHandler)
-    http.HandleFunc("/ws", handlers.WSHandler)
-	http.HandleFunc("/aggregate", handlers.AggregateHandler)
-	http.HandleFunc("/explain", handlers.ExplainSentimentHandler)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	log.Printf("🟢 Server listening on port %s", port)
-	log.Fatal(http.ListenAndServe(":" + port, nil))
+    log.Printf("🟢 Server listening on port %s", port)
+    handler := withCORS(mux)
+    log.Fatal(http.ListenAndServe(":"+port, handler))
 }

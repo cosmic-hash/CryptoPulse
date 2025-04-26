@@ -101,3 +101,48 @@ func DeleteAlertHandler(w http.ResponseWriter, r *http.Request) {
     log.Printf("[Delete] Step 4: successfully deleted subscription %q for user %q", id, userID)
 }
 
+// UpdateAlertHandler handles PUT /alerts/{id}
+// Expects header: X-User-ID
+// Body: { "coinId": 99, "threshold": 0.5 }
+func UpdateAlertHandler(w http.ResponseWriter, r *http.Request) {
+    userID := r.Header.Get("X-User-ID")
+    if userID == "" {
+        http.Error(w, "X-User-ID header required", http.StatusBadRequest)
+        return
+    }
+
+    // grab the Firestore doc ID injected in main.go
+    docID := r.URL.Query().Get("id")
+    if docID == "" {
+        http.Error(w, "Missing alert ID", http.StatusBadRequest)
+        return
+    }
+
+    // parse update payload
+    var req struct {
+        CoinID    int     `json:"coinId"`
+        Threshold float64 `json:"threshold"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+        return
+    }
+
+    // perform the update
+    if err := alert.UpdateSubscription(context.Background(), docID, req.CoinID, req.Threshold); err != nil {
+        log.Printf("[UpdateAlert] error updating %q: %v", docID, err)
+        http.Error(w, "Failed to update alert", http.StatusInternalServerError)
+        return
+    }
+
+    // respond with the updated values
+    w.Header().Set("Content-Type", "application/json")
+    resp := map[string]interface{}{
+        "id":        docID,
+        "coinId":    req.CoinID,
+        "threshold": req.Threshold,
+    }
+    json.NewEncoder(w).Encode(resp)
+}
+
+
