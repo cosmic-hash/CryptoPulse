@@ -67,3 +67,21 @@ header svg {
 header svg:hover {
     color: #00fff9;
 }
+
+.text-gradient {
+    background: linear-gradient(to right, #00fff9, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease;
+    font-weight: 700;
+}
+
+.text-gradient:hover {
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: #00fff9; /* solid neon blue text */
+    color: #00fff9;
+    text-shadow: 0 0 8px #00fff9;
+    transform: scale(1.02);
+}
+

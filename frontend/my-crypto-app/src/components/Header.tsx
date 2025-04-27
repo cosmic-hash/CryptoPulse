@@ -116,10 +116,12 @@ const Header: React.FC = () => {
     return (
         <header
             className={`p-4 border-b ${'border-pink-700'} ${'bg-gray-900 text-pink-300'} flex justify-between items-center`}>
-            <div className="text-3xl font-bold tracking-widest">
-                <Link to="/" >
-                CRYPTO PULSE
-            </Link></div>
+            <div className="flex items-center gap-2 text-3xl font-bold tracking-widest">
+                <img src="/images/cryptopulse-icon.svg" alt="CryptoPulse" className="w-8 h-8"/>
+                <Link to="/" className="text-gradient">
+                    CRYPTO PULSE
+                </Link>
+            </div>
             <div className="flex items-center gap-4">
                 <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                     Dashboard
