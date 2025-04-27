@@ -3,7 +3,6 @@ import psycopg2
 from flask import Flask, request, jsonify, render_template
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
-import os
 from functools import wraps
 from flask_cors import CORS
 import os
@@ -16,12 +15,11 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your-secret-key")
 
 
 def get_db_connection():
-    print("Creating DB connection...")
     return psycopg2.connect(os.environ['DATABASE_URL'])
 
 
-# json_creds = json.loads(os.environ['FIREBASE_CREDS'])
-cred = credentials.Certificate("crypto-pulse-76003-firebase-adminsdk-fbsvc-79173e1f99.json")
+json_creds = json.loads(os.environ['FIREBASE_CREDS'])
+cred = credentials.Certificate(json_creds)
 firebase_app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
