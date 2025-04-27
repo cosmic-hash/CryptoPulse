@@ -16,15 +16,22 @@ import (
     openai "github.com/cosmic-hash/CryptoPulse/pkg/openai"
 )
 
-// withCORS wraps your handler to support CORS
+// withCORS wraps your handler to support CORS (allowing all origins).
 func withCORS(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // allow your frontend origin (or "*" for all)
-        w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+        // Allow * or echo back the Origin header to whitelist dynamic callers:
+        origin := r.Header.Get("Origin")
+        if origin != "" {
+            w.Header().Set("Access-Control-Allow-Origin", origin)
+        } else {
+            w.Header().Set("Access-Control-Allow-Origin", "*")
+        }
+
         w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-User-ID")
+        // If you need cookies/auth:
+        // w.Header().Set("Access-Control-Allow-Credentials", "true")
 
-        // preflight
         if r.Method == http.MethodOptions {
             w.WriteHeader(http.StatusOK)
             return
