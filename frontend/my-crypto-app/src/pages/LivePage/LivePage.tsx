@@ -15,7 +15,7 @@ import './LivePage.css';
 
 const { Title } = Typography;
 
-const SOCKET_URL = 'ws://crypto-pulse-1-546660857332.us-central1.run.app/ws';
+const SOCKET_URL = 'wss://crypto-pulse-1-546660857332.us-central1.run.app/ws';
 
 const allCoins = ['BTC', 'ETH', 'USDT', 'XRP', 'BNB', 'SOL', 'USDC', 'TRX', 'DOGE', 'ADA'];
 

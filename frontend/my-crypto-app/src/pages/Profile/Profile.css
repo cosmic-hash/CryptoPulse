@@ -149,3 +149,27 @@ input[type="range"]::-webkit-slider-thumb {
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Scrollbar base styles */
+::-webkit-scrollbar {
+  width: 6px; /* thinner */
+  height: 6px;
+}
+
+/* Scrollbar track (background) */
+::-webkit-scrollbar-track {
+  background: #1e293b; /* dark blueish background */
+}
+
+/* Scrollbar thumb (the moving part) */
+::-webkit-scrollbar-thumb {
+  background-color: #69edea; /* soft neon blue */
+  border-radius: 8px;
+  border: 2px solid transparent; /* optional inner padding look */
+  background-clip: content-box;
+}
+
+/* Scrollbar on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #00fff9; /* brighter cyan on hover */
+}

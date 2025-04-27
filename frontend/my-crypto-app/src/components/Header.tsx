@@ -135,11 +135,11 @@ const Header: React.FC = () => {
 
                 {!loading && (user ? (
                     <button className="p-2" onClick={handleLogout}>
-                        <LogOut className="text-pink-300"/>
+                        <LogOut className="text-[#00fff9] transition" />
                     </button>
                 ) : (
                     <button className="p-2" onClick={handleLogin}>
-                        <span className="text-pink-300 font-bold">Login</span>
+                        <span className="text-[#00fff9] font-bold">Login</span>
                     </button>
                 ))}
             </div>
