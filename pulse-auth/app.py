@@ -166,16 +166,16 @@ def update_user_profile():
         return jsonify({"error": "Failed to update user profile", "details": str(e)}), 500
 
 
-# Add a coin to user's coins array
+# Update coins to user's coins array
 @app.route('/api/users/coins', methods=['POST'])
 @login_required
-def add_coin():
+def update_coins():
     uid = request.user['uid']
     data = request.json
 
-    coin_id = data.get('coin_id')
-    if not coin_id:
-        return jsonify({"error": "No coin_id provided"}), 400
+    coins = data.get('coins')
+    if not coins or not isinstance(coins, list):
+        return jsonify({"error": "No coins array provided or invalid format"}), 400
 
     try:
         user_ref = db.collection('users').document(uid)
@@ -184,9 +184,9 @@ def add_coin():
         if not user_doc.exists:
             return jsonify({"error": "User not found"}), 404
 
-        # Add the coin to the coins array if not already present
+        # Overwrite the 'coins' field with the new array
         user_ref.update({
-            'coins': firestore.ArrayUnion([coin_id])
+            'coins': coins
         })
 
         # Get the updated user data
@@ -194,12 +194,12 @@ def add_coin():
 
         return jsonify({
             "success": True,
-            "message": "Coin added successfully",
+            "message": "Coins updated successfully",
             "coins": updated_user.get('coins', [])
         })
 
     except Exception as e:
-        return jsonify({"error": "Failed to add coin", "details": str(e)}), 500
+        return jsonify({"error": "Failed to update coins", "details": str(e)}), 500
 
 
 # Add a question to user's questions array
