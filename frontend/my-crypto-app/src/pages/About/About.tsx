@@ -53,7 +53,7 @@ const About: React.FC = () => {
             <div className="architecture-section">
                 <h3>Architecture Overview</h3>
                 <div className="architecture-image-wrapper">
-                    <img src="/images/pavan.jpeg" alt="Architecture Diagram" />
+                    <img src="/images/architecture.png" alt="Architecture Diagram" />
                 </div>
             </div>
 
