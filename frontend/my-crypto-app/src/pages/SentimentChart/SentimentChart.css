@@ -1,9 +1,10 @@
 .chart-container {
     padding: 2rem;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     margin-top: 2rem;
+    overflow: hidden;
 }
 
 .chart-controls {
@@ -16,7 +17,7 @@
 .date-submit-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: flex-end;
 }
 
@@ -24,17 +25,17 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 200px;
 }
 
 .submit-button-wrapper {
     display: flex;
     align-items: flex-end;
-    height: 100%;
 }
 
 .ant-picker {
     width: 100%;
-    max-width: 300px;
+    max-width: 250px;
 }
 
 .ant-checkbox-group {
@@ -43,7 +44,7 @@
     gap: 1rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .date-submit-row {
         flex-direction: column;
         align-items: stretch;
@@ -51,37 +52,39 @@
 
     .submit-button-wrapper {
         align-items: stretch;
+        width: 100%;
     }
 }
 
 .custom-tooltip {
     width: 320px;
-    max-height: 280px;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     display: flex;
     flex-direction: column;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    overflow: hidden;
     font-size: 14px;
     line-height: 1.5;
+    overflow: hidden;
 }
 
 .custom-tooltip-header {
     font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
-    flex-shrink: 0;
+    color: #1f2937;
+    font-size: 16px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
 }
 
 .custom-tooltip-body {
     overflow-y: auto;
-    max-height: 200px;
-    padding-right: 6px;
+    max-height: 220px;
+    padding-right: 8px;
     scrollbar-width: thin;
-    scrollbar-color: #ccc transparent;
+    scrollbar-color: #d1d5db transparent;
 }
 
 .custom-tooltip-body::-webkit-scrollbar {
@@ -89,32 +92,38 @@
 }
 
 .custom-tooltip-body::-webkit-scrollbar-thumb {
-    background-color: #ccc;
+    background-color: #d1d5db;
     border-radius: 3px;
 }
 
 .custom-tooltip-item {
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.custom-tooltip-item:last-child {
+    border-bottom: none;
 }
 
 .custom-tooltip-item strong {
-    color: #0073e6;
     display: block;
+    color: #3b82f6;
+    font-weight: 600;
 }
 
 .custom-tooltip-item small {
     display: block;
-    color: #555;
-    font-size: 12px;
+    color: #6b7280;
     margin-top: 4px;
+    font-size: 12px;
 }
 
 .recharts-tooltip-wrapper {
     z-index: 999 !important;
     pointer-events: auto !important;
 }
+
 .tooltip-row {
     display: flex;
     justify-content: space-between;
@@ -122,7 +131,7 @@
 }
 
 .sentiment-value {
-    margin-left: 8px;
-    font-weight: 500;
-    color: #222;
+    margin-left: 6px;
+    font-weight: 600;
+    color: #1e293b;
 }
