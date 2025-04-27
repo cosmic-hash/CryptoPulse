@@ -1,9 +1,7 @@
 from datetime import datetime, timezone
-
-
 from flask import Flask, jsonify, request
 from fetch_posts import fetch_reddit_posts, reddit
-from dotenv import load_dotenv
+from flask_cors import CORS
 import os
 import psycopg2
 import psycopg2.extras
@@ -11,6 +9,7 @@ from psycopg2 import OperationalError, InterfaceError
 import json
 
 app = Flask(__name__)
+CORS(app)
 
 DB_CONFIG = {
     'host': os.getenv('DB_HOST'),
