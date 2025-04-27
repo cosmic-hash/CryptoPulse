@@ -2,8 +2,8 @@ import json
 import csv
 
 # File paths
-json_file = "../output.json"
-csv_file = "../scores.csv"
+json_file = "output.json"
+csv_file = "scores.csv"
 
 # Load JSON data
 with open(json_file, "r") as f:

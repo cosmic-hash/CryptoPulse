@@ -2,8 +2,8 @@ import json
 import requests
 
 # --- File paths ---
-input_file = "../crypto_news_input.json"
-output_file = "../output.json"
+input_file = "news.json"
+output_file = "output.json"
 
 # --- Load input JSON ---
 with open(input_file, "r") as f:

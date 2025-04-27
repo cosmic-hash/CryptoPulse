@@ -2,7 +2,7 @@ import json
 import psycopg2
 
 # --- Load Scored Data ---
-with open("../output.json", "r") as f:
+with open("output.json", "r") as f:
     scored_data = json.load(f)
 
 # --- PostgreSQL DB Connection ---
