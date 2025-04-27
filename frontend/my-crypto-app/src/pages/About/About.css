@@ -87,7 +87,9 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     min-height: 280px;
     border: 1px solid #334155;
+    justify-content: space-between;
 }
+
 
 .developer-card:hover {
     transform: translateY(-5px);
@@ -109,13 +111,21 @@
     font-weight: 600;
     margin-bottom: 0.4rem;
     color: #f9fafb;
+    width: 100%;
+    word-break: break-word;
+    max-width: 200px;
+    min-height: 2.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .developer-email {
     font-size: 0.8rem;
     color: #00f7ff;
-    margin-bottom: 1rem;
+    margin: 0;
 }
+
 
 .linkedin-button {
     display: inline-block;

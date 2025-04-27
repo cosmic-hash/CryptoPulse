@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     LineChart,
     Line,
@@ -149,17 +149,40 @@ const SentimentChart: React.FC = () => {
         return [start, end];
     });
 
-    const [selectedCoins, setSelectedCoins] = useState<string[]>(allCoins);
+    const [selectedCoins, setSelectedCoins] = useState<string[]>([]);
     const [chartData, setChartData] = useState<SentimentPoint[]>([]);
     const [loading, setLoading] = useState(false);
+
+    const coinSymbolToName: Record<string, string> = {
+        BTC: "Bitcoin",
+        ETH: "Ethereum",
+        USDT: "Tether",
+        XRP: "XRP",
+        BNB: "BNB",
+        SOL: "Solana",
+        USDC: "USD Coin",
+        TRX: "TRON",
+        DOGE: "Dogecoin",
+        ADA: "Cardano",
+    };
+
+    const coinNameToSymbol: Record<string, string> = Object.fromEntries(
+        Object.entries(coinSymbolToName).map(([k, v]) => [v, k])
+    );
+
 
     const fetchAndUpdateChart = async () => {
         setLoading(true);
         try {
+            const coinsToSend = selectedCoins.map((coinName) => {
+                const symbol = Object.entries(coinSymbolToName).find(([, name]) => name === coinName)?.[0];
+                return symbol || coinName;
+            });
+
             const data = await fetchSentimentData(
                 timeRange[0].toDate(),
                 timeRange[1].toDate(),
-                selectedCoins
+                coinsToSend
             );
             setChartData(data);
             message.success('Sentiment data loaded');
@@ -169,6 +192,36 @@ const SentimentChart: React.FC = () => {
             setLoading(false);
         }
     };
+
+
+    useEffect(() => {
+        const fetchUserCoins = async () => {
+            const token = localStorage.getItem('backendToken');
+            if (!token) return;
+
+            try {
+                const res = await fetch('https://auth-app-877042335787.us-central1.run.app/api/users/profile', {
+                    headers: { Authorization: token },
+                });
+                const data = await res.json();
+                console.log(data)
+                if (data.success || data.user.coins) {
+                    const userCoins: string[] = data.user.coins || [];
+
+                    const mappedCoins = userCoins
+                        .map(symbol => coinSymbolToName[symbol])
+                        .filter(name => !!name);
+
+                    setSelectedCoins(mappedCoins.length > 0 ? mappedCoins : allCoins);
+                }
+            } catch (error) {
+                console.error('Failed to fetch user coins', error);
+                setSelectedCoins(allCoins); // fallback
+            }
+        };
+
+        fetchUserCoins();
+    }, []);
 
     const handleCoinChange = (checkedValues: string[]) => {
         setSelectedCoins(checkedValues);
@@ -249,13 +302,14 @@ const SentimentChart: React.FC = () => {
                                         <div className="custom-tooltip-header">{label}</div>
                                         <div className="custom-tooltip-body">
                                             {payload.map((entry) => {
-                                                const coin = (entry.dataKey as string).split('.')[1];
+                                                const symbol = (entry.dataKey as string).split('.')[1];
+                                                const coin = coinSymbolToName[symbol] || symbol;
                                                 const value = entry.value;
                                                 const fullData = entry.payload as any;
-                                                const reason = fullData.title?.[coin];
+                                                const reason = fullData.title?.[symbol];
 
                                                 return (
-                                                    <div key={coin} className="custom-tooltip-item">
+                                                    <div key={symbol} className="custom-tooltip-item">
                                                         <strong>{coin}: {Number(value).toFixed(3)}</strong>
                                                         {reason && <small>{reason}</small>}
                                                     </div>
@@ -272,16 +326,19 @@ const SentimentChart: React.FC = () => {
                                 return <span style={{ color: '#333' }}>{coin}</span>;
                             }}
                         />
-                        {selectedCoins.map((coin, index) => (
-                            <Line
-                                key={coin}
-                                type="monotone"
-                                dataKey={`sentiment.${coin}`}
-                                strokeWidth={2}
-                                stroke={coinColors[index % coinColors.length]}
-                                dot={{ r: 3 }}
-                            />
-                        ))}
+                        {selectedCoins.map((coin, index) => {
+                            const symbol = coinNameToSymbol[coin];
+                            return (
+                                <Line
+                                    key={coin}
+                                    type="monotone"
+                                    dataKey={`sentiment.${symbol}`}
+                                    strokeWidth={2}
+                                    stroke={coinColors[index % coinColors.length]}
+                                    dot={{ r: 3 }}
+                                />
+                            );
+                        })}
                     </LineChart>
                 </ResponsiveContainer>
             </Spin>
