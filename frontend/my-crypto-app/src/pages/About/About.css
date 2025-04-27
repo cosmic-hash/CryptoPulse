@@ -1,38 +1,63 @@
 .about {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    padding: 2.5rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    max-width: 1400px; /* ✅ increased from 1300px to 1400px */
+}
+
+.about h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #6366f1, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.about p {
+    text-align: center;
+    font-size: 1rem;
+    color: #4b5563;
+    max-width: 700px;
+    margin: 0 auto 2rem;
 }
 
 .developers-heading {
     margin-top: 3rem;
     font-size: 1.8rem;
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
-    color: #333;
+    color: #111827;
 }
 
 .developers-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 1.5rem;
     justify-content: center;
     margin-top: 2rem;
 }
 
 .developer-card {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 260px;
-
-    /* Center everything inside the card */
+    background: white;
+    padding: 1.5rem;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    width: 220px; /* ✅ smaller safe width */
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 280px;
+}
+
+.developer-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
 }
 
 .developer-image {
@@ -41,31 +66,87 @@
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 1rem;
+    border: 3px solid #6366f1;
 }
 
 .developer-name {
-    font-size: 1.3rem;
-    font-weight: bold;
+    font-size: 1.1rem;
+    font-weight: 600;
     margin-bottom: 0.5rem;
+    color: #1f2937;
 }
 
 .developer-email {
-    font-size: 0.95rem;
-    color: #4ab855;
+    font-size: 0.85rem;
+    color: #10b981;
     margin-bottom: 1rem;
 }
 
 .linkedin-button {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: #0077b5;
+    padding: 0.4rem 1rem;
+    background: linear-gradient(to right, #0077b5, #005582);
     color: white;
-    border-radius: 4px;
+    border-radius: 6px;
     text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .linkedin-button:hover {
-    background-color: #005582;
+    background: linear-gradient(to right, #005582, #003d66);
+}
+
+.architecture-section {
+    margin: 4rem 0;
+    text-align: center;
+}
+
+.architecture-section h3 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to right, #06b6d4, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.architecture-image-wrapper {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.architecture-image-wrapper img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 16px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .developer-card {
+        width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .developers-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .developer-card {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .architecture-section h3 {
+        font-size: 1.6rem;
+    }
 }

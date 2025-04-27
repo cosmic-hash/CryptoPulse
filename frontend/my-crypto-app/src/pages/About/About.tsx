@@ -26,16 +26,38 @@ const developers: Developer[] = [
         email: "bob@example.com",
         linkedInUrl: "https://www.linkedin.com/in/bobsmith/",
         imageUrl: "/images/bob.png",
-    }
+    },
+    {
+        name: "Charlie Brown",
+        email: "charlie@example.com",
+        linkedInUrl: "https://www.linkedin.com/in/charliebrown/",
+        imageUrl: "/images/charlie.png",
+    },
+    {
+        name: "Diana Prince",
+        email: "diana@example.com",
+        linkedInUrl: "https://www.linkedin.com/in/dianaprince/",
+        imageUrl: "/images/diana.png",
+    },
 ];
 
 const About: React.FC = () => {
     return (
         <div className="about">
             <h2>About CryptoPulse</h2>
-            <p>This app helps you track crypto trends and market stats in real time.</p>
+            <p>
+                CryptoPulse is your gateway to real-time crypto market insights and trend analysis.
+                We help you track sentiment, news, and market changes to stay ahead in the fast-moving world of cryptocurrencies.
+            </p>
 
-            <h3 className="developers-heading">Meet the Developers</h3>
+            <div className="architecture-section">
+                <h3>Architecture Overview</h3>
+                <div className="architecture-image-wrapper">
+                    <img src="/images/pavan.jpeg" alt="Architecture Diagram" />
+                </div>
+            </div>
+
+            <h3 className="developers-heading">Meet the Team</h3>
             <div className="developers-container">
                 {developers.map((dev) => (
                     <div className="developer-card" key={dev.email}>
