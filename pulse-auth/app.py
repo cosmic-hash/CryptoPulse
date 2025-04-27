@@ -1,20 +1,30 @@
 import json
-
+import psycopg2
 from flask import Flask, request, jsonify, render_template
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 import os
 from functools import wraps
 from flask_cors import CORS
+import os
+
+from utils import send_via_gmail
 
 app = Flask(__name__)
 CORS(app)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your-secret-key")
 
-json_creds = json.loads(os.environ['FIREBASE_CREDS'])
-cred = credentials.Certificate(json_creds)
+
+def get_db_connection():
+    print("Creating DB connection...")
+    return psycopg2.connect(os.environ['DATABASE_URL'])
+
+
+# json_creds = json.loads(os.environ['FIREBASE_CREDS'])
+cred = credentials.Certificate("crypto-pulse-76003-firebase-adminsdk-fbsvc-79173e1f99.json")
 firebase_app = firebase_admin.initialize_app(cred)
 db = firestore.client()
+
 
 # Authentication decorator
 def login_required(f):
@@ -38,9 +48,11 @@ def login_required(f):
 
     return decorated_function
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 # Route to handle Google Sign-In and user creation/update
 @app.route('/api/auth/google', methods=['POST'])
@@ -226,6 +238,55 @@ def add_question():
 
     except Exception as e:
         return jsonify({"error": "Failed to add question", "details": str(e)}), 500
+
+
+@app.route('/check-alerts', methods=['GET'])
+def check_alerts():
+    subs = db.collection('alert_subscriptions').stream()
+
+    pg_cur = get_db_connection().cursor()
+    triggered = []
+
+    for sub in subs:
+        coin_id, email, threshold = (
+            sub.to_dict().get('coinId'),
+            sub.to_dict().get('email'),
+            sub.to_dict().get('threshold', 0),
+        )
+
+        pg_cur.execute("""
+                       SELECT s.sentiment_score, c.name
+                       FROM aggregated_sentiments s
+                                JOIN currency c
+                                     ON s.coin_id = c.id
+                       WHERE s.coin_id = %s
+                       ORDER BY s.window_start DESC LIMIT 1
+                       """, (coin_id,))
+        row = pg_cur.fetchone()
+        if not row:
+            continue
+
+        score, coin_name = row
+
+        if (0 > threshold > score) or (0 <= threshold < score):
+            try:
+                subject = f'🚨 {coin_name} sentiment alert: {score}'
+                body = (
+                    f'Your alert for {coin_name} fired.\n'
+                    f'Current score: {score}\n'
+                    f'Set Threshold:     {threshold}'
+                )
+                send_via_gmail(subject, body, email)
+                triggered.append({'coin_id': coin_id, 'email': email, 'score': score})
+            except Exception as e:
+                print(f"SMTP error sending to {email}: {e}")
+
+    pg_cur.close()
+    return jsonify({
+        'status': 'processed',
+        'alerts_sent': triggered
+    }), 200
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
