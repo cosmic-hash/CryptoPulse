@@ -1,3 +1,9 @@
 Flask==3.1.0
+<<<<<<< HEAD
 Flask-Cors==4.0.0
 firebase-admin==6.0.1
+=======
+firebase-admin==6.0.1
+psycopg2-binary==2.9.6
+flask-cors==3.0.10
+>>>>>>> 4b9f7b5f86641f48c8391f17d072d35945ff9a92
