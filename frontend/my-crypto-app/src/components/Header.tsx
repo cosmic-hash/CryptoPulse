@@ -114,7 +114,8 @@ const Header: React.FC = () => {
 
 
     return (
-        <header className={`p-4 border-b ${'border-pink-700'} ${'bg-gray-900 text-pink-300'} flex justify-between items-center`}>
+        <header
+            className={`p-4 border-b ${'border-pink-700'} ${'bg-gray-900 text-pink-300'} flex justify-between items-center`}>
             <div className="text-3xl font-bold tracking-widest">CRYPTO PULSE</div>
             <div className="flex items-center gap-4">
                 <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
@@ -123,9 +124,19 @@ const Header: React.FC = () => {
                 <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>
                     About
                 </Link>
-            <button className="p-2">
-                <LogOut className={"text-pink-300"} />
-            </button>
+                <Link to="/profile" className={location.pathname === '/profile' ? 'active' : ''}>
+                    Profile
+                </Link>
+
+                {!loading && (user ? (
+                    <button className="p-2" onClick={handleLogout}>
+                        <LogOut className="text-pink-300"/>
+                    </button>
+                ) : (
+                    <button className="p-2" onClick={handleLogin}>
+                        <span className="text-pink-300 font-bold">Login</span>
+                    </button>
+                ))}
             </div>
         </header>
 

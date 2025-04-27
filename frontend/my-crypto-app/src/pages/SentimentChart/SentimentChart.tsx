@@ -81,32 +81,66 @@ const generateMockData = (
     return data;
 };
 
-
 const fetchSentimentData = async (
     start: Date,
     end: Date,
     coins: string[]
 ): Promise<SentimentPoint[]> => {
-    const rangeMinutes = (end.getTime() - start.getTime()) / 60000;
-    if (rangeMinutes > 180) {
-        message.error('Please select a time range less than or equal to 2 hours.');
-        return [];
+    try {
+        const response = await fetch('https://stream-app-877042335787.us-central1.run.app/news', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                start_date: start.toISOString(),
+                end_date: end.toISOString(),
+                currency_codes: coins,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+
+        const newsData: {
+            currency_code: string;
+            id: number;
+            newsdatetime: string;
+            score: number;
+            title: string;
+            url: string;
+        }[] = await response.json();
+
+        const grouped: Record<string, SentimentPoint> = {};
+
+        newsData.forEach(item => {
+            const timeKey = dayjs(item.newsdatetime).format('DD-MMMM-YYYY HH:mm');
+
+            if (!grouped[timeKey]) {
+                grouped[timeKey] = {
+                    time: timeKey,
+                    sentiment: {},
+                    title: {},
+                };
+            }
+
+            grouped[timeKey].sentiment[item.currency_code] = item.score;
+            grouped[timeKey].title[item.currency_code] = item.title;
+        });
+
+        const sortedData = Object.values(grouped).sort((a, b) =>
+            dayjs(a.time, 'DD-MMMM-YYYY HH:mm').toDate().getTime() -
+            dayjs(b.time, 'DD-MMMM-YYYY HH:mm').toDate().getTime()
+        );
+
+        return sortedData;
+    } catch (error) {
+        console.error('Error fetching sentiment data:', error);
+        throw error;
     }
-
-    const payload = {
-        startTime: start.toISOString(),
-        endTime: end.toISOString(),
-        coins,
-    };
-
-    console.log('payload:', payload);
-
-    return new Promise((resolve) =>
-        setTimeout(() => {
-            resolve(generateMockData(start, end, 5, coins));
-        }, 1000)
-    );
 };
+
 
 const SentimentChart: React.FC = () => {
     const [timeRange, setTimeRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>(() => {
@@ -155,60 +189,21 @@ const SentimentChart: React.FC = () => {
                                 format="MM/DD HH:mm"
                                 onChange={(value) => {
                                     if (value) {
-                                        const maxEnd = value.add(3, 'hour');
-                                        let newEnd = timeRange[1];
-                                        if (!newEnd || newEnd.isBefore(value) || newEnd.isAfter(maxEnd)) {
-                                            newEnd = maxEnd;
-                                        }
-                                        setTimeRange([value, newEnd]);
+                                        setTimeRange([value, timeRange[1]]);
                                     }
                                 }}
                             />
                         </div>
 
                         <div className="control-group">
-                            <label>End Time (max 3 hours after start):</label>
+                            <label>End Time:</label>
                             <DatePicker
                                 showTime
                                 value={timeRange[1]}
                                 format="MM/DD HH:mm"
-                                disabledDate={(current) => {
-                                    const start = timeRange[0];
-                                    return current.isBefore(start) || current.isAfter(start.add(3, 'hour'));
-                                }}
-                                disabledTime={(date) => {
-                                    const start = timeRange[0];
-                                    const max = start.add(3, 'hour');
-                                    if (!date) return {};
-                                    if (!date.isSame(max, 'day')) return {};
-                                    return {
-                                        disabledHours: () => {
-                                            const hours: number[] = [];
-                                            for (let h = max.hour() + 1; h < 24; h++) {
-                                                hours.push(h);
-                                            }
-                                            return hours;
-                                        },
-                                        disabledMinutes: (selectedHour) => {
-                                            if (selectedHour === max.hour()) {
-                                                const mins: number[] = [];
-                                                for (let m = max.minute() + 1; m < 60; m++) {
-                                                    mins.push(m);
-                                                }
-                                                return mins;
-                                            }
-                                            return [];
-                                        },
-                                    };
-                                }}
                                 onChange={(value) => {
                                     if (value) {
-                                        const duration = value.diff(timeRange[0], 'minute');
-                                        if (duration > 180) {
-                                            message.error('Range must be 3 hours or less.');
-                                        } else {
-                                            setTimeRange([timeRange[0], value]);
-                                        }
+                                        setTimeRange([timeRange[0], value]);
                                     }
                                 }}
                             />
@@ -237,11 +232,13 @@ const SentimentChart: React.FC = () => {
                         <XAxis
                             dataKey="time"
                             tickFormatter={(v) =>
-                                dayjs(v, 'DD-MMMM-YYYY HH:mm').format('DD-MMMM HH:mm')
+                                dayjs(v, 'DD-MMMM-YYYY HH:mm').format('DD/MM HH:mm')
                             }
                             interval="preserveStartEnd"
+                            angle={-10}
+                            textAnchor="end"
                         />
-                        <YAxis domain={[-1, 1]} tickFormatter={(v) => v.toFixed(1)} />
+                        <YAxis domain={[-1, 1]} tickFormatter={(v) => v.toFixed(3)} />
                         <Tooltip
                             wrapperStyle={{ pointerEvents: 'auto', maxHeight: 300, overflowY: 'auto' }}
                             content={({ active, payload, label }) => {
@@ -259,7 +256,7 @@ const SentimentChart: React.FC = () => {
 
                                                 return (
                                                     <div key={coin} className="custom-tooltip-item">
-                                                        <strong>{coin}: {Number(value).toFixed(2)}</strong>
+                                                        <strong>{coin}: {Number(value).toFixed(3)}</strong>
                                                         {reason && <small>{reason}</small>}
                                                     </div>
                                                 );

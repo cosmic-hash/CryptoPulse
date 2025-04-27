@@ -1,0 +1,43 @@
+.chart-container {
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+/* Controls */
+.control-group {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Time range buttons */
+.time-range-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.time-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.time-btn:hover {
+    background: #e6f7ff;
+    border-color: #1890ff;
+}
+
+.time-btn.active {
+    background: #1890ff;
+    color: white;
+    border-color: #1890ff;
+}
