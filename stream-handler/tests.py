@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 import pytest
 from unittest.mock import patch, MagicMock
-from app import app
 
 @pytest.fixture(autouse=True)
 def mock_reddit():
@@ -10,6 +9,8 @@ def mock_reddit():
         mock_reddit_instance.user.me.return_value = "mock_user"
         mock_reddit_class.return_value = mock_reddit_instance
         yield
+
+from app import app
 
 @pytest.fixture
 def client():
