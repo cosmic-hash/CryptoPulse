@@ -1,43 +1,41 @@
+
 .dashboard-container {
-    /*margin-top: 2rem;*/
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    /*border-radius: 16px;*/
-    box-shadow: 0 8px 30px rgba(0, 255, 255, 0.08);
+    background: linear-gradient(145deg, #0d1321, #1A1F2C);
+    box-shadow: 0 6px 24px rgba(0, 255, 255, 0.1);
+    /*border-radius: 12px;*/
     overflow: hidden;
-    padding: 1rem;
+    font-family: 'Inter', sans-serif;
 }
 
 .tabs {
-    display: flex;
-    background: #1e293b;
-    border-bottom: 1px solid #334155;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #181C28;
+    border-bottom: 1px solid #2D3148;
 }
 
 .tab {
     padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 500;
     background: transparent;
-    color: #94a3b8;
+    color: #8A8D9F;
     cursor: pointer;
     border: none;
-    transition: all 0.3s ease;
-    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
 }
 
 .tab.active {
-    color: #00fff9;
-    border-bottom: 3px solid #00fff9;
-    background: #1f2937;
+    color: #00eaff;
+    background: rgba(0, 234, 255, 0.08);
 }
 
-.tab:hover {
-    color: #0ea5e9;
-    background: #1f2937;
+.tab:hover:not(.active) {
+    color: #00b7eb;
+    background: rgba(0, 183, 235, 0.04);
 }
 
 .tab-content {
-    padding: 2rem 1rem;
-    background: #0f172a;
-    border-radius: 12px;
+    background: #0d1321;
+    border-radius: 0 0 12px 12px;
 }

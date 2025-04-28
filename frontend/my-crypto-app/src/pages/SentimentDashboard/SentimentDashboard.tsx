@@ -4,7 +4,7 @@ import LivePage from '../LivePage/LivePage';
 import './SentimentDashboard.css';
 
 const SentimentDashboard: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<'historical' | 'live'>('historical');
+    const [activeTab, setActiveTab] = useState<'historical' | 'live'>('live');
 
     return (
         <div className="dashboard-container">

@@ -33,9 +33,18 @@ export default function CryptoProfilePage() {
   const [formThresholdAlert, setFormThresholdAlert] = useState('');
 
   const coinNameToId: Record<string, number> = {
-    BTC: 1, ETH: 2, USDT: 3, XRP: 4, BNB: 5,
-    SOL: 6, USDC: 7, TRX: 8, DOGE: 9, ADA: 10,
+    BTC: 91,
+    ETH: 92,
+    USDT: 93,
+    XRP: 97,
+    BNB: 95,
+    SOL: 99,
+    USDC: 94,
+    TRX: 103,
+    DOGE: 100,
+    ADA: 96,
   };
+
 
   const coinIdToName = (id: number) =>
       Object.entries(coinNameToId).find(([, val]) => val === id)?.[0] ?? '';
@@ -233,21 +242,21 @@ export default function CryptoProfilePage() {
   };
 
   return (
-      <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'}`}>
-        <div className="container mx-auto px-4 py-10 max-w-7xl">
+      <div className="profile-page">
+        <div className="profile-content">
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
+
           {/* Profile Section */}
           {profileData && (
-              <div className="mb-10 p-8 rounded-2xl bg-gray-900 border border-gray-700 shadow-lg">
+              <div className="profile-card animate-fade-in p-6 rounded-xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                   <div className="flex justify-center">
-                    <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400">
-                      <img src={profileData.profilePic} alt="Profile" className="w-full h-full object-cover"/>
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-blue-400">
+                      <img src={profileData.profilePic} alt="Profile" className="w-full h-full object-cover" />
                     </div>
                   </div>
-
                   <div className="col-span-2 text-center md:text-left">
-                    <h1 className="text-2xl font-bold mb-2">{profileData.name}</h1>
+                    <h1>{profileData.name}</h1>
                     <p className="text-sm text-gray-400 mb-4">{profileData.email}</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-gray-800">
@@ -264,19 +273,16 @@ export default function CryptoProfilePage() {
               </div>
           )}
 
-          <div className="mb-8 p-6 rounded-lg bg-gray-800">
+          {/* Selected Coins Section */}
+          <div className="coin-section animate-fade-in p-4 rounded-lg">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-pink-300">SELECTED COINS</h2>
+              <h2>Selected Coins</h2>
               <button
                   onClick={saveSelectedCoins}
                   disabled={!coinsChanged() || savingCoins}
-                  className={`px-6 py-2 rounded-lg font-bold ${
-                      coinsChanged() && !savingCoins
-                          ? 'bg-pink-500 hover:bg-pink-600 text-black'
-                          : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  }`}
+                  className={coinsChanged() && !savingCoins ? 'button-primary' : 'button-outline'}
               >
-                {savingCoins ? 'Saving...' : 'Save Changes'}
+                {savingCoins ? 'Saving...' : 'Save'}
               </button>
             </div>
 
@@ -285,11 +291,7 @@ export default function CryptoProfilePage() {
                   <button
                       key={coin}
                       onClick={() => toggleCoin(coin)}
-                      className={`px-4 py-2 rounded-t border-2 text-sm font-bold ${
-                          selectedCoins.includes(coin)
-                              ? 'bg-pink-900 border-pink-500 text-pink-300'
-                              : 'bg-gray-700 border-gray-600 text-gray-400'
-                      }`}
+                      className={`coin-chip ${selectedCoins.includes(coin) ? 'selected' : ''}`}
                   >
                     {coin}
                   </button>
@@ -298,33 +300,35 @@ export default function CryptoProfilePage() {
           </div>
 
           {/* Sentiment Alerts */}
-          <div className="p-8 rounded-2xl bg-gray-900 border border-gray-700 shadow-lg">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <div className="alert-section animate-fade-in p-6 rounded-xl">
+            <h2 className="text-lg font-semibold mb-4">
               <Bell/> Sentiment Alerts
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-6">
               {sentimentAlerts.map((alert) => (
-                  <div key={alert.id}
-                       className="p-4 flex justify-between items-center rounded-lg bg-gray-800 hover:bg-gray-700 transition">
+                  <div key={alert.id} className="p-4 flex justify-between items-center rounded-lg bg-gray-800 hover:bg-gray-700 transition">
                     <div>
-                      <h3 className="text-md font-semibold text-white">{coinIdToName(alert.coinId)} @ {alert.threshold.toFixed(2)}</h3>
+                      <h3 className="text-md font-semibold text-white">
+                        {coinIdToName(alert.coinId)} @ {alert.threshold.toFixed(2)}
+                      </h3>
                       <p className="text-xs text-gray-400">Triggers when sentiment hits {alert.threshold}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => openEditAlertModal(alert)}
-                              className="p-2 rounded bg-gray-700 hover:bg-blue-500 transition">
-                        <Edit size={16} className="text-white"/>
+                      <button onClick={() => openEditAlertModal(alert)} className="p-2 rounded bg-gray-700 hover:bg-blue-500 transition">
+                        <Edit size={16} className="text-white" />
                       </button>
-                      <button onClick={() => handleDeleteAlert(alert.id)}
-                              className="p-2 rounded bg-red-500 hover:bg-red-600">
-                        <Trash2 size={16} className="text-white"/>
+                      <button onClick={() => handleDeleteAlert(alert.id)} className="p-2 rounded bg-red-500 hover:bg-red-600">
+                        <Trash2 size={16} className="text-white" />
                       </button>
                     </div>
                   </div>
               ))}
-              <button onClick={openAddAlertModal}
-                      className="w-full mt-6 p-3 border-2 border-dashed rounded-xl border-blue-400 text-blue-400 hover:bg-blue-500 hover:text-black transition">
+
+              <button
+                  onClick={openAddAlertModal}
+                  className="w-full mt-6 p-3 border-2 border-dashed rounded-xl border-blue-400 text-blue-400 hover:bg-blue-500 hover:text-black transition"
+              >
                 + Create New Alert
               </button>
             </div>
@@ -332,14 +336,13 @@ export default function CryptoProfilePage() {
 
           {/* Modal */}
           {isSentimentModalOpen && (
-              <div className="fixed inset-0 bg-black/70 flex justify-center items-center p-4 z-50">
-                <div className="bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-2xl">
-                  <h2 className="text-xl font-bold mb-4">{sentimentModalMode === 'add' ? 'Create Alert' : 'Edit Alert'}</h2>
+              <div className="modal-overlay animate-fade-in">
+                <div className="modal-content p-6 rounded-xl">
+                  <h2>{sentimentModalMode === 'add' ? 'Create Alert' : 'Edit Alert'}</h2>
 
                   <div className="mb-4">
                     <label className="block text-sm text-gray-400 mb-1">Select Coin</label>
-                    <select value={formCoinAlert} onChange={(e) => setFormCoinAlert(e.target.value)}
-                            className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white">
+                    <select value={formCoinAlert} onChange={(e) => setFormCoinAlert(e.target.value)}>
                       <option value="">-- Select Coin --</option>
                       {allCoins.map((c) => (
                           <option key={c} value={c}>{c}</option>
@@ -349,18 +352,21 @@ export default function CryptoProfilePage() {
 
                   <div className="mb-6">
                     <label className="block text-sm text-gray-400 mb-1">Threshold (-1.0 to 1.0)</label>
-                    <input type="number" min="-1" max="1" step="0.01" value={formThresholdAlert}
-                           onChange={(e) => setFormThresholdAlert(e.target.value)}
-                           className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white"/>
+                    <input
+                        type="number"
+                        min="-1"
+                        max="1"
+                        step="0.01"
+                        value={formThresholdAlert}
+                        onChange={(e) => setFormThresholdAlert(e.target.value)}
+                    />
                   </div>
 
                   <div className="flex justify-end gap-3">
-                    <button onClick={() => setIsSentimentModalOpen(false)}
-                            className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-white">
+                    <button onClick={() => setIsSentimentModalOpen(false)} className="button-outline">
                       Cancel
                     </button>
-                    <button onClick={handleSaveAlert}
-                            className="px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-black font-bold">
+                    <button onClick={handleSaveAlert} className="button-primary">
                       Save
                     </button>
                   </div>
@@ -370,4 +376,5 @@ export default function CryptoProfilePage() {
         </div>
       </div>
   );
+
 }

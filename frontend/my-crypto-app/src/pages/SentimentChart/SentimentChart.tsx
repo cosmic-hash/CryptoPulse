@@ -23,9 +23,10 @@ import './SentimentChart.css';
 const { Title } = Typography;
 
 const allCoins = [
-    'Bitcoin', 'Ethereum', 'Tether', 'XRP', 'BNB',
-    'Solana', 'USD Coin', 'TRON', 'Dogecoin', 'Cardano'
+    'Bitcoin', 'Ethereum', 'Tether', 'Ripple', 'Binance',
+    'Solana', 'CryptoCurrency', 'Tronix', 'Dogecoin', 'Cardano'
 ];
+
 
 const coinColors = [
     '#e6194b', '#3cb44b', '#ffe119', '#0082c8', '#f58231',
@@ -141,30 +142,31 @@ const fetchSentimentData = async (
     }
 };
 
-
 const SentimentChart: React.FC = () => {
     const [timeRange, setTimeRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>(() => {
-        const end = dayjs();
-        const start = end.subtract(30, 'minute');
+        const start = dayjs('2025-01-01T00:00:00');
+        const end = dayjs('2025-01-02T23:59:59');
         return [start, end];
     });
 
     const [selectedCoins, setSelectedCoins] = useState<string[]>([]);
     const [chartData, setChartData] = useState<SentimentPoint[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     const coinSymbolToName: Record<string, string> = {
         BTC: "Bitcoin",
         ETH: "Ethereum",
         USDT: "Tether",
-        XRP: "XRP",
-        BNB: "BNB",
+        XRP: "Ripple",
+        BNB: "Binance",
         SOL: "Solana",
-        USDC: "USD Coin",
-        TRX: "TRON",
+        USDC: "CryptoCurrency",
+        TRX: "Tronix",
         DOGE: "Dogecoin",
         ADA: "Cardano",
     };
+
 
     const coinNameToSymbol: Record<string, string> = Object.fromEntries(
         Object.entries(coinSymbolToName).map(([k, v]) => [v, k])
@@ -193,19 +195,21 @@ const SentimentChart: React.FC = () => {
         }
     };
 
-
     useEffect(() => {
         const fetchUserCoins = async () => {
             const token = localStorage.getItem('backendToken');
-            if (!token) return;
+            if (!token) {
+                setSelectedCoins(allCoins); // Default to all coins if no token
+                return;
+            }
 
             try {
                 const res = await fetch('https://auth-app-877042335787.us-central1.run.app/api/users/profile', {
                     headers: { Authorization: token },
                 });
                 const data = await res.json();
-                console.log(data)
-                if (data.success || data.user.coins) {
+
+                if (data.success || data.user?.coins) {
                     const userCoins: string[] = data.user.coins || [];
 
                     const mappedCoins = userCoins
@@ -213,15 +217,25 @@ const SentimentChart: React.FC = () => {
                         .filter(name => !!name);
 
                     setSelectedCoins(mappedCoins.length > 0 ? mappedCoins : allCoins);
+                } else {
+                    setSelectedCoins(allCoins); // Default to all coins
                 }
             } catch (error) {
                 console.error('Failed to fetch user coins', error);
-                setSelectedCoins(allCoins); // fallback
+                setSelectedCoins(allCoins); // Default to all coins on error
             }
         };
 
         fetchUserCoins();
     }, []);
+
+    // Auto-submit on initial load once coins are loaded
+    useEffect(() => {
+        if (isInitialLoad && selectedCoins.length > 0) {
+            fetchAndUpdateChart();
+            setIsInitialLoad(false);
+        }
+    }, [selectedCoins, isInitialLoad]);
 
     const handleCoinChange = (checkedValues: string[]) => {
         setSelectedCoins(checkedValues);
@@ -239,7 +253,7 @@ const SentimentChart: React.FC = () => {
                             <DatePicker
                                 showTime
                                 value={timeRange[0]}
-                                format="MM/DD HH:mm"
+                                format="YYYY/MM/DD HH:mm"
                                 onChange={(value) => {
                                     if (value) {
                                         setTimeRange([value, timeRange[1]]);
@@ -253,7 +267,7 @@ const SentimentChart: React.FC = () => {
                             <DatePicker
                                 showTime
                                 value={timeRange[1]}
-                                format="MM/DD HH:mm"
+                                format="YYYY/MM/DD HH:mm"
                                 onChange={(value) => {
                                     if (value) {
                                         setTimeRange([timeRange[0], value]);
@@ -293,7 +307,13 @@ const SentimentChart: React.FC = () => {
                         />
                         <YAxis domain={[-1, 1]} tickFormatter={(v) => v.toFixed(3)} />
                         <Tooltip
-                            wrapperStyle={{ pointerEvents: 'auto', maxHeight: 300, overflowY: 'auto' }}
+                            wrapperStyle={{
+                                pointerEvents: 'auto',
+                                maxHeight: 300,
+                                overflowY: 'auto',
+                                backgroundColor: '#1A1F2C',
+                                zIndex: 999
+                            }}
                             content={({ active, payload, label }) => {
                                 if (!active || !payload || payload.length === 0) return null;
 
@@ -323,7 +343,7 @@ const SentimentChart: React.FC = () => {
                         <Legend
                             formatter={(value) => {
                                 const coin = value.split('.')[1];
-                                return <span style={{ color: '#333' }}>{coin}</span>;
+                                return <span style={{ color: '#ffffff' }}>{coin}</span>;
                             }}
                         />
                         {selectedCoins.map((coin, index) => {

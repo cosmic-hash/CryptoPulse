@@ -43,37 +43,39 @@ const developers: Developer[] = [
 
 const About: React.FC = () => {
     return (
-        <div className="about">
-            <h2>About CryptoPulse</h2>
-            <p>
-                CryptoPulse is your gateway to real-time crypto market insights and trend analysis.
-                We help you track sentiment, news, and market changes to stay ahead in the fast-moving world of cryptocurrencies.
-            </p>
+        <div className="about-page">
+            <div className="about-content">
+                <h2>About CryptoPulse</h2>
+                <p>
+                    CryptoPulse is your gateway to real-time crypto market insights and trend analysis.
+                    We help you track sentiment, news, and market changes to stay ahead in the fast-moving world of cryptocurrencies.
+                </p>
 
-            <div className="architecture-section">
-                <h3>Architecture Overview</h3>
-                <div className="architecture-image-wrapper">
-                    <img src="/images/architecture.png" alt="Architecture Diagram" />
-                </div>
-            </div>
-
-            <h3 className="developers-heading">Meet the Team</h3>
-            <div className="developers-container">
-                {developers.map((dev) => (
-                    <div className="developer-card" key={dev.email}>
-                        <img src={dev.imageUrl} alt={dev.name} className="developer-image" />
-                        <h4 className="developer-name">{dev.name}</h4>
-                        <p className="developer-email">{dev.email}</p>
-                        <a
-                            href={dev.linkedInUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="linkedin-button"
-                        >
-                            View LinkedIn
-                        </a>
+                <div className="architecture-section">
+                    <h3>Architecture Overview</h3>
+                    <div className="architecture-image-wrapper">
+                        <img src="/images/architecture.png" alt="Architecture Diagram" />
                     </div>
-                ))}
+                </div>
+
+                <h3 className="developers-heading">Meet the Team</h3>
+                <div className="developers-container">
+                    {developers.map((dev) => (
+                        <div className="developer-card" key={dev.email}>
+                            <img src={dev.imageUrl} alt={dev.name} className="developer-image" />
+                            <h4 className="developer-name">{dev.name}</h4>
+                            <p className="developer-email" title={dev.email}>{dev.email}</p>
+                            <a
+                                href={dev.linkedInUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="linkedin-button"
+                            >
+                                View LinkedIn
+                            </a>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
