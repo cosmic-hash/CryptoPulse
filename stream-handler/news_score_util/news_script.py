@@ -1,9 +1,9 @@
+import csv
 import json
 import requests
 
-# --- File paths ---
-input_file = "news.json"
-output_file = "output.json"
+input_file = "neondb_public_crypto_news.json"
+csv_file = "scores.csv"
 
 # --- Load input JSON ---
 with open(input_file, "r") as f:
@@ -13,7 +13,7 @@ with open(input_file, "r") as f:
 titles = [item["title"] for item in input_data]
 
 # --- Call Sentiment API ---
-api_url = "https://sentiment-app-877042335787.us-central1.run.app/sentence-sentiment-analyze"
+api_url = "http://127.0.0.1:8080/predict_sentiment"
 headers = {"Content-Type": "application/json"}
 
 response = requests.post(api_url, headers=headers, data=json.dumps(titles))
@@ -26,8 +26,10 @@ output_data = [
     for item, score in zip(input_data, scores)
 ]
 
-# --- Write to output file ---
-with open(output_file, "w") as f:
-    json.dump(output_data, f, indent=2)
+# Write to CSV
+with open(csv_file, "w", newline='', encoding='utf-8') as f:
+    writer = csv.DictWriter(f, fieldnames=["id", "title", "score"])
+    writer.writeheader()
+    writer.writerows(output_data)
 
-print(f"Done! Output written to {output_file}")
+print(f"CSV written to {csv_file}")
