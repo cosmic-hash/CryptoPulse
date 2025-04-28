@@ -34,12 +34,12 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 - Implement real-time trend detection for new coins.
 
 ## Built With
-React.js - Frontend Framework
-Go - Backend Aggregator Service
-VADER & BERT - Sentiment Analysis Models
-Docker - Containerization
-GitHub Actions - CI/CD Pipelines
-Google Cloud Run - Deployment Platform
+- React.js - Frontend Framework
+- Go - Backend Aggregator Service
+- VADER & BERT - Sentiment Analysis Models
+- Docker - Containerization
+- GitHub Actions - CI/CD Pipelines
+- Google Cloud Run - Deployment Platform
 
 
 
