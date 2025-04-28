@@ -37,7 +37,6 @@ def sentence_sentiment_analyze():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Load model and tokenizer once
 model_name = "nlptown/bert-base-multilingual-uncased-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
@@ -55,7 +54,6 @@ def predict_sentiment():
         if not paragraphs or not isinstance(paragraphs, list):
             return jsonify({"error": "Please provide a plain array of paragraphs"}), 400
 
-        # Batch tokenize
         inputs = tokenizer(paragraphs, return_tensors="pt", padding=True, truncation=True)
         inputs = {k: v.to(device) for k, v in inputs.items()}
 
@@ -64,7 +62,6 @@ def predict_sentiment():
             logits = outputs.logits
             predictions = torch.argmax(logits, dim=1)
 
-        # Map predictions to scores between -1.0 and 1.0
         scores = [round(((pred.item() + 1) - 3) / 2, 3) for pred in predictions]
 
         return jsonify(scores)
