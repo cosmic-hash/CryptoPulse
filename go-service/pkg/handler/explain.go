@@ -6,6 +6,7 @@ import (
     "fmt"
     "log"
     "net/http"
+    "sort"
     "strings"
     "time"
 
@@ -30,19 +31,25 @@ func ExplainSentimentHandler(w http.ResponseWriter, r *http.Request) {
     // 1) Decode request
     var req explainRequest
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        http.Error(w, "invalid JSON", http.StatusBadRequest)
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(explainResponse{Explanation: "Invalid request"})
         return
     }
 
     // 2) Parse times
     start, err := time.Parse(time.RFC3339, req.StartTime)
     if err != nil {
-        http.Error(w, "bad start_time", http.StatusBadRequest)
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(explainResponse{Explanation: "Bad start time"})
         return
     }
     end, err := time.Parse(time.RFC3339, req.EndTime)
     if err != nil {
-        http.Error(w, "bad end_time", http.StatusBadRequest)
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(explainResponse{Explanation: "Bad end time"})
         return
     }
 
@@ -51,12 +58,36 @@ func ExplainSentimentHandler(w http.ResponseWriter, r *http.Request) {
     raws, err := db.FetchRawMessagesForCoinBetween(ctx, req.CoinID, start, end)
     if err != nil {
         log.Printf("[Explain] DB error: %v", err)
-        http.Error(w, "db error", http.StatusInternalServerError)
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(explainResponse{Explanation: "Database error"})
         return
     }
     if len(raws) == 0 {
-        http.Error(w, "no messages found", http.StatusNotFound)
-        return
+        log.Printf("[Explain] no messages in window, fetching last 2 months")
+        fallbackStart := end.AddDate(0, -2, 0)
+        alt, err := db.FetchRawMessagesForCoinBetween(ctx, req.CoinID, fallbackStart, end)
+        if err != nil {
+            log.Printf("[Explain] DB fallback error: %v", err)
+            w.Header().Set("Content-Type", "application/json")
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(explainResponse{Explanation: "Database error"})
+            return
+        }
+        if len(alt) == 0 {
+            w.Header().Set("Content-Type", "application/json")
+            w.WriteHeader(http.StatusNotFound)
+            json.NewEncoder(w).Encode(explainResponse{Explanation: "No messages"})
+            return
+        }
+        // sort by recency and take up to 10 nearest to end
+        sort.Slice(alt, func(i, j int) bool {
+            return alt[i].CreatedAt.After(alt[j].CreatedAt)
+        })
+        if len(alt) > 10 {
+            alt = alt[:10]
+        }
+        raws = alt
     }
 
     // 4) Build a prompt from up to the first 20 messages
@@ -76,7 +107,7 @@ func ExplainSentimentHandler(w http.ResponseWriter, r *http.Request) {
         sb.WriteString(m.Content)
         sb.WriteString("\n")
     }
-    sb.WriteString("\nBased on these, explain why the overall sentiment was positive or negative.")
+    sb.WriteString("\nMention all the reasons why this sentiment occurred and please be direct, giving only the reasons.")
 
     // 5) Call OpenAI
     chatReq := gpt.ChatCompletionNewParams{
@@ -89,7 +120,9 @@ func ExplainSentimentHandler(w http.ResponseWriter, r *http.Request) {
     chatResp, err := oai.ChatClient.Chat.Completions.New(ctx, chatReq)
     if err != nil {
         log.Printf("[Explain] OpenAI error: %v", err)
-        http.Error(w, "AI error", http.StatusInternalServerError)
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(explainResponse{Explanation: "AI error"})
         return
     }
 

@@ -16,22 +16,29 @@ import (
     openai "github.com/cosmic-hash/CryptoPulse/pkg/openai"
 )
 
-// withCORS wraps your handler to support CORS (allowing all origins).
+// withCORS wraps your handler to support CORS by echoing back the Origin
 func withCORS(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // Allow * or echo back the Origin header to whitelist dynamic callers:
+        allowedOrigins := []string{"http://localhost:3000", "https://dbm5g4posudq7.cloudfront.net"}
         origin := r.Header.Get("Origin")
-        if origin != "" {
+        allowed := false
+        for _, o := range allowedOrigins {
+            if o == origin {
+                allowed = true
+                break
+            }
+        }
+        if allowed {
             w.Header().Set("Access-Control-Allow-Origin", origin)
         } else {
             w.Header().Set("Access-Control-Allow-Origin", "*")
         }
-
+        w.Header().Set("Access-Control-Allow-Credentials", "true")
+        w.Header().Set("Vary", "Origin")
         w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-User-ID")
-        // If you need cookies/auth:
-        // w.Header().Set("Access-Control-Allow-Credentials", "true")
 
+        // short-circuit OPTIONS
         if r.Method == http.MethodOptions {
             w.WriteHeader(http.StatusOK)
             return
