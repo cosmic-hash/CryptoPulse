@@ -3,8 +3,10 @@ name: Run Pulse-Auth Tests
 on:
   push:
     branches:
+      - main
   pull_request:
     branches:
+      - main
 
 jobs:
   test:
@@ -22,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r pulse-auth/requirements.txt
         pip install pytest
 
     - name: Run tests

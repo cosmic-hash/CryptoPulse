@@ -46,11 +46,9 @@ def login_required(f):
 
     return decorated_function
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 # Route to handle Google Sign-In and user creation/update
 @app.route('/api/auth/google', methods=['POST'])
