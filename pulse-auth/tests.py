@@ -24,14 +24,11 @@ app.config['TESTING'] = True
 import pytest
 from unittest.mock import patch, MagicMock
 
-# Client Fixture
 @pytest.fixture
 def client():
     with app.test_client() as client:
         yield client
 
-
-# Decorator for authenticated test cases
 def with_auth_token(f):
     def wrapper(*args, **kwargs):
         # Add authentication credentials to the test request
@@ -40,18 +37,14 @@ def with_auth_token(f):
 
     return wrapper
 
-# Test Google Sign-in Missing ID token
 def test_auth_google_missing_token(client):
     response = client.post('/api/auth/google', json={})
     assert response.status_code == 400
 
-# Test Get User Profile Success
 @patch('app.auth')
 def test_get_user_profile_success(mock_auth, client):
-    # Configure auth mock
     mock_auth.verify_id_token.return_value = {'uid': 'testuid'}
 
-    # Set up database mocks
     with patch('app.db.collection') as mock_collection:
         mock_user_ref = MagicMock()
         mock_user_doc = MagicMock()
@@ -60,23 +53,17 @@ def test_get_user_profile_success(mock_auth, client):
         mock_user_ref.get.return_value = mock_user_doc
         mock_collection.return_value.document.return_value = mock_user_ref
 
-        # Make the authenticated request
         headers = {'Authorization': 'Bearer fake-token'}
         response = client.get('/api/users/profile', headers=headers)
 
-        # Verify response
         assert response.status_code == 200
         assert response.get_json()["success"] is True
         assert response.get_json()["user"]["name"] == "Test User"
 
-
-# Test Update User Profile Success
 @patch('app.auth')
 def test_update_user_profile_success(mock_auth, client):
-    # Configure auth mock
     mock_auth.verify_id_token.return_value = {'uid': 'testuid'}
 
-    # Set up database mocks
     with patch('app.db.collection') as mock_collection:
         mock_user_ref = MagicMock()
         mock_user_doc = MagicMock()
@@ -85,19 +72,15 @@ def test_update_user_profile_success(mock_auth, client):
         mock_user_ref.get.return_value = mock_user_doc
         mock_collection.return_value.document.return_value = mock_user_ref
 
-        # Make the authenticated request
         headers = {'Authorization': 'Bearer fake-token'}
         response = client.patch('/api/users/profile', json={'name': 'New Name'}, headers=headers)
 
-        # Verify response
         assert response.status_code == 200
         assert response.get_json()["success"] is True
 
-        # Verify the database update was called
         mock_user_ref.update.assert_called_once_with({'name': 'New Name'})
 
 
-# Test Update Coins Success
 @patch('app.auth')
 def test_update_coins_success(mock_auth, client):
     # Configure auth mock
