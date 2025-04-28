@@ -52,7 +52,7 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 - Sai Gautham Ghanta
 - Heera Menon 
 
-## Appendix
+## Appendix📎
 Presentation: 
 
 
