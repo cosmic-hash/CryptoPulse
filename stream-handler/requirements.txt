@@ -24,3 +24,4 @@ flask-cors~=5.0.1
 psycopg2~=2.9.10
 pytest~=8.3.5
 beautifulsoup4~=4.13.4
+pytest-mock
