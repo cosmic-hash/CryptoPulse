@@ -270,8 +270,8 @@ def check_alerts():
                 body = (
                     f'Hey there,\n\n'
                     f'Your sentiment alert for **{coin_name}** just triggered! 📈\n\n'
-                    f'🔹 **Current Sentiment Score:** {score}\n'
-                    f'🔹 **Your Set Threshold:** {threshold}\n\n'
+                    f'🔹 Current Sentiment Score: {score}\n'
+                    f'🔹 Your Set Threshold: {threshold}\n\n'
                     f'Stay sharp and make your move! 🚀✨\n\n'
                     f'– CryptoPulse Alerts'
                 )
