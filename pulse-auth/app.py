@@ -1,35 +1,46 @@
 import json
+<<<<<<< HEAD
 import psycopg2
+=======
 
+>>>>>>> dcb8661 (sec commit)
 from flask import Flask, request, jsonify, render_template
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
+import os
 from functools import wraps
 from flask_cors import CORS
+<<<<<<< HEAD
 import os
 
 from utils import send_via_gmail
+=======
+>>>>>>> dcb8661 (sec commit)
 
 app = Flask(__name__)
 CORS(app)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your-secret-key")
 
+<<<<<<< HEAD
 
 def get_db_connection():
+    print("Creating DB connection...")
     return psycopg2.connect(os.environ['DATABASE_URL'])
 
 
+# json_creds = json.loads(os.environ['FIREBASE_CREDS'])
+cred = credentials.Certificate("crypto-pulse-76003-firebase-adminsdk-fbsvc-79173e1f99.json")
+firebase_app = firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+
+=======
 json_creds = json.loads(os.environ['FIREBASE_CREDS'])
 cred = credentials.Certificate(json_creds)
 firebase_app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-
-json_creds = json.loads(os.environ['FIREBASE_CREDS'])
-cred = credentials.Certificate(json_creds)
-firebase_app = firebase_admin.initialize_app(cred)
-db = firestore.client()
-
+>>>>>>> dcb8661 (sec commit)
 # Authentication decorator
 def login_required(f):
     @wraps(f)
@@ -52,10 +63,18 @@ def login_required(f):
 
     return decorated_function
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> dcb8661 (sec commit)
 @app.route('/')
 def index():
     return render_template('index.html')
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> dcb8661 (sec commit)
 # Route to handle Google Sign-In and user creation/update
 @app.route('/api/auth/google', methods=['POST'])
 def auth_google():
@@ -170,16 +189,16 @@ def update_user_profile():
         return jsonify({"error": "Failed to update user profile", "details": str(e)}), 500
 
 
-# Update coins to user's coins array
+# Add a coin to user's coins array
 @app.route('/api/users/coins', methods=['POST'])
 @login_required
-def update_coins():
+def add_coin():
     uid = request.user['uid']
     data = request.json
 
-    coins = data.get('coins')
-    if not coins or not isinstance(coins, list):
-        return jsonify({"error": "No coins array provided or invalid format"}), 400
+    coin_id = data.get('coin_id')
+    if not coin_id:
+        return jsonify({"error": "No coin_id provided"}), 400
 
     try:
         user_ref = db.collection('users').document(uid)
@@ -188,9 +207,9 @@ def update_coins():
         if not user_doc.exists:
             return jsonify({"error": "User not found"}), 404
 
-        # Overwrite the 'coins' field with the new array
+        # Add the coin to the coins array if not already present
         user_ref.update({
-            'coins': coins
+            'coins': firestore.ArrayUnion([coin_id])
         })
 
         # Get the updated user data
@@ -198,12 +217,12 @@ def update_coins():
 
         return jsonify({
             "success": True,
-            "message": "Coins updated successfully",
+            "message": "Coin added successfully",
             "coins": updated_user.get('coins', [])
         })
 
     except Exception as e:
-        return jsonify({"error": "Failed to update coins", "details": str(e)}), 500
+        return jsonify({"error": "Failed to add coin", "details": str(e)}), 500
 
 
 # Add a question to user's questions array
@@ -241,6 +260,7 @@ def add_question():
     except Exception as e:
         return jsonify({"error": "Failed to add question", "details": str(e)}), 500
 
+<<<<<<< HEAD
 
 @app.route('/check-alerts', methods=['GET'])
 def check_alerts():
@@ -293,6 +313,8 @@ def check_alerts():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(debug=False, host='0.0.0.0', port=port)
+=======
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(debug=False, host='0.0.0.0', port=port)
+>>>>>>> dcb8661 (sec commit)
