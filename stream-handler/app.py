@@ -313,10 +313,6 @@ def reddit_db_dump():
         print(f"Error during DB dump: {e}")
         return {"status": "error", "message": str(e)}, 500
 
-
-# Test insert endpoint
-@app.route("/test_insert", methods=["POST"])
-
 # Corrected /test_insert endpoint for raw_messages
 @app.route("/test_insert", methods=["POST"])
 def test_insert():
