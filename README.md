@@ -1,11 +1,11 @@
 # CryptoPulse 🚀
 ## Your Crypto-Invest Mate
 
-## Introduction ☁️
+## Introduction 🌟
 Crypto markets move fast, but real-time public sentiment is scattered across Reddit, Twitter, and various news outlets.
 CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-related sentiment in real time, empowering investors with smarter insights.
 
-## Key Features 💸
+## Key Features 🔥
 - Fetch live crypto discussions from Reddit (Twitter limited due to new API costs )
 - Analyze emotions behind the chatter using Vader and BERT AI models 
 - Aggregate sentiments into a single score using a custom-built Go service
@@ -14,7 +14,7 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 
 
 
-## Architecture Overview 🎨
+## Architecture Overview 🛠
 ![image](https://github.com/user-attachments/assets/9b355d98-55f1-4b3e-b823-ec027d0ed6df)
 
 ## Roadblocks We Crushed 🤖
@@ -37,7 +37,7 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 - Expand support to smaller cryptocurrencies.
 - Implement real-time trend detection for new coins.
 
-## Built With ☁️
+## Built With 🧑‍💻
 - React.js - Frontend Framework
 - Reddit | Twitter | News CryptoPanic dump - Data Collection
 - Firebase Authentication - Login Authenticator 
