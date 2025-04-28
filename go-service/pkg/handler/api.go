@@ -12,6 +12,14 @@ import (
 	"github.com/cosmic-hash/CryptoPulse/pkg/model"
 )
 
+// for test injection
+var (
+    fetchRawMessagesBetween   = db.FetchRawMessagesBetween
+    fetchInitialLastSentiments = db.FetchInitialLastSentiments
+    insertAggregatedBatch     = db.InsertAggregatedSentimentBatch
+    fetchMessageScores        = db.FetchMessageScoresFromDB
+)
+
 type CoinInfo struct {
     ID        int
     Code      string
@@ -65,7 +73,7 @@ func AggregateHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // 2) Fetch raw messages
-    raw, err := db.FetchRawMessagesBetween(start, end)
+    raw, err := fetchRawMessagesBetween(start, end)
     if err != nil {
         log.Printf("[Aggregate] fetch raw error: %v", err)
         http.Error(w, "db fetch failed", http.StatusInternalServerError)
@@ -99,7 +107,7 @@ func AggregateHandler(w http.ResponseWriter, r *http.Request) {
     for _, c := range coinsList {
         coinIDs = append(coinIDs, c.ID)
     }
-    lastSent, err := db.FetchInitialLastSentiments(coinIDs, start)
+    lastSent, err := fetchInitialLastSentiments(coinIDs, start)
     if err != nil {
         log.Printf("[Aggregate] fetch initial error: %v", err)
         http.Error(w, "internal error", http.StatusInternalServerError)
@@ -169,7 +177,7 @@ func AggregateHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // 6) Bulk insert everything (duplicates noop)
-    if err := db.InsertAggregatedSentimentBatch(toInsert); err != nil {
+    if err := insertAggregatedBatch(toInsert); err != nil {
         log.Printf("[Aggregate] Bulk insert error: %v", err)
     } else {
         log.Printf("[Aggregate] Bulk insert OK: %d records", len(toInsert))
@@ -198,7 +206,7 @@ func SentimentHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // 1) Fetch data from DB
-    samples, err := db.FetchMessageScoresFromDB()
+    samples, err := fetchMessageScores()
     if err != nil {
         log.Printf("DB fetch error: %v", err)
         http.Error(w, "Internal server error", http.StatusInternalServerError)

@@ -27,15 +27,20 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('go-service/go.sum') }}
+          restore-keys: |
+            go-${{ runner.os }}-
 
       - name: Install dependencies
+        working-directory: go-service
         run: go mod download
 
       - name: Run unit tests
+        working-directory: go-service
         run: go test ./... -v
 
       - name: Build binary
+        working-directory: go-service
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
             go build -o go-service ./cmd/server/main.go
