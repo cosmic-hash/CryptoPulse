@@ -16,6 +16,7 @@ import {
     Typography,
     Spin,
     Button,
+    Modal,
 } from 'antd';
 import dayjs from 'dayjs';
 import './SentimentChart.css';
@@ -27,7 +28,6 @@ const allCoins = [
     'Solana', 'CryptoCurrency', 'Tronix', 'Dogecoin', 'Cardano'
 ];
 
-
 const coinColors = [
     '#e6194b', '#3cb44b', '#ffe119', '#0082c8', '#f58231',
     '#911eb4', '#46f0f0', '#f032e6', '#d2f53c', '#fabebe'
@@ -37,49 +37,7 @@ type SentimentPoint = {
     time: string;
     sentiment: Record<string, number>;
     title: Record<string, string>;
-};
-
-const generateMockData = (
-    start: Date,
-    end: Date,
-    intervalMinutes: number,
-    selectedCoins: string[]
-): SentimentPoint[] => {
-    const data: SentimentPoint[] = [];
-    const current = new Date(start);
-
-    const mockTitles = [
-        "Strong investor interest pushes price higher",
-        "Bearish trend due to market uncertainty",
-        "Major exchange lists the token",
-        "Whale activity detected",
-        "Analyst upgrades forecast",
-        "Market correction in progress",
-        "Protocol upgrade announced",
-        "Partnership news drives optimism",
-        "Legal clarity improves sentiment",
-        "Community votes on governance proposal"
-    ];
-
-    while (current <= end) {
-        const point: SentimentPoint = {
-            time: dayjs(current).format('DD-MMMM-YYYY HH:mm'),
-            sentiment: {},
-            title: {}
-        };
-
-        selectedCoins.forEach((coin) => {
-            const sentimentScore = parseFloat((Math.random() * 2 - 1).toFixed(2));
-            const randomTitle = mockTitles[Math.floor(Math.random() * mockTitles.length)];
-            point.sentiment[coin] = sentimentScore;
-            point.title[coin] = randomTitle;
-        });
-
-        data.push(point);
-        current.setMinutes(current.getMinutes() + intervalMinutes);
-    }
-
-    return data;
+    url: Record<string, string>;
 };
 
 const fetchSentimentData = async (
@@ -123,11 +81,13 @@ const fetchSentimentData = async (
                     time: timeKey,
                     sentiment: {},
                     title: {},
+                    url: {},
                 };
             }
 
             grouped[timeKey].sentiment[item.currency_code] = item.score;
             grouped[timeKey].title[item.currency_code] = item.title;
+            grouped[timeKey].url[item.currency_code] = item.url;
         });
 
         const sortedData = Object.values(grouped).sort((a, b) =>
@@ -154,6 +114,14 @@ const SentimentChart: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+    // State for news modal
+    const [modalVisible, setModalVisible] = useState(false);
+    const [currentNewsUrl, setCurrentNewsUrl] = useState("");
+    const [currentNewsTitle, setCurrentNewsTitle] = useState("");
+
+    // New state to track active line/coin
+    const [activeCoin, setActiveCoin] = useState<string | null>(null);
+
     const coinSymbolToName: Record<string, string> = {
         BTC: "Bitcoin",
         ETH: "Ethereum",
@@ -167,11 +135,62 @@ const SentimentChart: React.FC = () => {
         ADA: "Cardano",
     };
 
-
     const coinNameToSymbol: Record<string, string> = Object.fromEntries(
         Object.entries(coinSymbolToName).map(([k, v]) => [v, k])
     );
 
+    // Handler for opening news in modal
+    const openNewsModal = (url: string, title: string) => {
+        setCurrentNewsUrl(url);
+        setCurrentNewsTitle(title);
+        setModalVisible(true);
+    };
+
+    // Direct handler for opening news in new tab (without modal)
+    const openNewsInNewTab = (url?: string) => {
+        const urlToOpen = url || currentNewsUrl;
+        if (urlToOpen) {
+            window.open(urlToOpen, '_blank', 'noopener,noreferrer');
+        }
+        setModalVisible(false);
+    };
+
+    // NEW: Handle data point click
+    const handlePointClick = (data: any) => {
+        if (!data || !data.activeLabel) return;
+
+        // Get the clicked time
+        const clickedTime = data.activeLabel;
+
+        // Find the corresponding data point
+        const dataPoint = chartData.find(point => point.time === clickedTime);
+        if (!dataPoint) return;
+
+        // Use the active coin if available, otherwise use the first selected coin
+        const coinSymbol = activeCoin ||
+            (selectedCoins.length > 0 ? coinNameToSymbol[selectedCoins[0]] : null);
+
+        if (!coinSymbol) {
+            message.warning('Please select a coin first');
+            return;
+        }
+
+        const url = dataPoint.url[coinSymbol];
+        const title = dataPoint.title[coinSymbol] || 'News';
+
+        if (url) {
+            // Directly open in new tab
+            openNewsInNewTab(url);
+        } else {
+            message.info('No news URL available for this data point');
+        }
+    };
+
+    // NEW: Handle line mouse enter to track active coin
+    const handleLineMouseEnter = (dataKey: string) => {
+        const coinSymbol = dataKey.split('.')[1];
+        setActiveCoin(coinSymbol);
+    };
 
     const fetchAndUpdateChart = async () => {
         setLoading(true);
@@ -293,8 +312,15 @@ const SentimentChart: React.FC = () => {
                     </div>
                 </div>
 
+                <div className="chart-instructions">
+                    Click on a data point to open the related news article in a new tab
+                </div>
+
                 <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={chartData}>
+                    <LineChart
+                        data={chartData}
+                        onClick={handlePointClick} // NEW: Add click handler
+                    >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                             dataKey="time"
@@ -322,20 +348,52 @@ const SentimentChart: React.FC = () => {
                                         <div className="custom-tooltip-header">{label}</div>
                                         <div className="custom-tooltip-body">
                                             {payload.map((entry) => {
-                                                const symbol = (entry.dataKey as string).split('.')[1];
+                                                const dataKey = entry.dataKey as string;
+                                                const symbol = dataKey.split('.')[1];
                                                 const coin = coinSymbolToName[symbol] || symbol;
                                                 const value = entry.value;
                                                 const fullData = entry.payload as any;
-                                                const reason = fullData.title?.[symbol];
+                                                const title = fullData.title?.[symbol];
+                                                const url = fullData.url?.[symbol];
+                                                const isActive = symbol === activeCoin;
 
                                                 return (
-                                                    <div key={symbol} className="custom-tooltip-item">
-                                                        <strong>{coin}: {Number(value).toFixed(3)}</strong>
-                                                        {reason && <small>{reason}</small>}
+                                                    <div
+                                                        key={symbol}
+                                                        className="custom-tooltip-item"
+                                                        style={{
+                                                            fontWeight: isActive ? 'bold' : 'normal',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                        onClick={() => {
+                                                            setActiveCoin(symbol);
+                                                            if (url) {
+                                                                openNewsInNewTab(url);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <strong>
+                                                            {coin}: {Number(value).toFixed(3)}
+                                                            {isActive && ' (selected)'}
+                                                        </strong>
+                                                        {title && <small>{title}</small>}
+                                                        {url && (
+                                                            <Button
+                                                                size="small"
+                                                                className="news-link-button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    openNewsModal(url, title || 'News');
+                                                                }}
+                                                            >
+                                                                Read News
+                                                            </Button>
+                                                        )}
                                                     </div>
                                                 );
                                             })}
                                         </div>
+                                        <p className="tooltip-hint">Click on a coin name above or a data point to open the news article</p>
                                     </div>
                                 );
                             }}
@@ -345,23 +403,62 @@ const SentimentChart: React.FC = () => {
                                 const coin = value.split('.')[1];
                                 return <span style={{ color: '#ffffff' }}>{coin}</span>;
                             }}
+                            onClick={(entry) => {
+                                if (typeof entry.dataKey === 'string') {
+                                    const coinSymbol = entry.dataKey.split('.')[1];
+                                    setActiveCoin(coinSymbol);
+                                }
+                            }}
                         />
                         {selectedCoins.map((coin, index) => {
                             const symbol = coinNameToSymbol[coin];
+                            const dataKey = `sentiment.${symbol}`;
+                            const isActive = symbol === activeCoin;
+
                             return (
                                 <Line
                                     key={coin}
                                     type="monotone"
-                                    dataKey={`sentiment.${symbol}`}
-                                    strokeWidth={2}
+                                    dataKey={dataKey}
+                                    strokeWidth={isActive ? 3 : 2}
                                     stroke={coinColors[index % coinColors.length]}
-                                    dot={{ r: 3 }}
+                                    dot={{
+                                        r: isActive ? 5 : 3,
+                                        stroke: '#fff',
+                                        strokeWidth: isActive ? 2 : 1,
+                                        cursor: 'pointer'
+                                    }}
+                                    activeDot={{
+                                        r: isActive ? 7 : 5,
+                                        stroke: '#fff',
+                                        strokeWidth: 2,
+                                        cursor: 'pointer'
+                                    }}
+                                    onMouseEnter={() => handleLineMouseEnter(dataKey)}
                                 />
                             );
                         })}
                     </LineChart>
                 </ResponsiveContainer>
             </Spin>
+
+            {/* News URL Modal */}
+            <Modal
+                title={currentNewsTitle}
+                open={modalVisible}
+                onCancel={() => setModalVisible(false)}
+                footer={[
+                    <Button key="close" onClick={() => setModalVisible(false)}>
+                        Close
+                    </Button>,
+                    <Button key="open" type="primary" onClick={() => openNewsInNewTab()}>
+                        Open in New Tab
+                    </Button>
+                ]}
+            >
+                <p>Would you like to visit this news article?</p>
+                <p className="news-url">{currentNewsUrl}</p>
+            </Modal>
         </div>
     );
 };
