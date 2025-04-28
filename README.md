@@ -17,7 +17,7 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 ## Architecture Overview 🛠
 ![image](https://github.com/user-attachments/assets/9b355d98-55f1-4b3e-b823-ec027d0ed6df)
 
-## Roadblocks We Crushed 🤖
+## Roadblocks We Crushed 🛤
 - API Limits: Designed smart retry and batching strategies to fetch large data volumes efficiently.
 - Twitter Limitations: Shifted focus to Reddit, ensuring strong sentiment signals without extra costs.
 - Live Topic Synthesis: Condensed real-time discussions to reveal the key drivers behind observed sentiment.
