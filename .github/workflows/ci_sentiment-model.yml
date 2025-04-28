@@ -1,12 +1,10 @@
-name: Run Stream-Handler Tests
+name: Run Sentiment-Model Tests
 
 on:
   push:
     branches:
-      - main
   pull_request:
     branches:
-      - main
 
 jobs:
   test:
@@ -24,9 +22,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r stream-handler/requirements.txt
+        pip install -r requirements.txt
         pip install pytest
 
     - name: Run tests
       run: |
-        pytest stream-handler/tests.py --maxfail=5 --disable-warnings --tb=short
+        pytest sentiment-model/tests.py --maxfail=5 --disable-warnings --tb=short
