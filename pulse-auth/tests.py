@@ -1,31 +1,24 @@
 import os
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-# Set up mocks before importing any application modules
 os.environ['FIREBASE_CREDS'] = '{}'
 
-# Create comprehensive mocks for Firebase
 firebase_admin_mock = MagicMock()
 auth_mock = MagicMock()
 firestore_mock = MagicMock()
 
-# Configure detailed behavior for auth mock
 auth_mock.verify_id_token = MagicMock(return_value={
     'uid': 'testuid',
     'email': 'test@example.com'
 })
 auth_mock.create_custom_token = MagicMock(return_value=b'custom-token')
 
-# Patch sys.modules with our mocks before importing app
 sys.modules['firebase_admin'] = firebase_admin_mock
 sys.modules['firebase_admin.auth'] = auth_mock
 sys.modules['firebase_admin.firestore'] = firestore_mock
 
-# Now import the Flask app
 from app import app as app
-
-# Ensure the Flask app is set to testing mode
 app.config['TESTING'] = True
 
 import pytest
