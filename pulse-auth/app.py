@@ -266,11 +266,14 @@ def check_alerts():
 
         if (0 > threshold > score) or (0 <= threshold < score):
             try:
-                subject = f'🚨 {coin_name} sentiment alert: {score}'
+                subject = f'🚨 {coin_name} Sentiment Alert! | Score: {score}'
                 body = (
-                    f'Your alert for {coin_name} fired.\n'
-                    f'Current score: {score}\n'
-                    f'Set Threshold:     {threshold}'
+                    f'Hey there,\n\n'
+                    f'Your sentiment alert for **{coin_name}** just triggered! 📈\n\n'
+                    f'🔹 **Current Sentiment Score:** {score}\n'
+                    f'🔹 **Your Set Threshold:** {threshold}\n\n'
+                    f'Stay sharp and make your move! 🚀✨\n\n'
+                    f'– CryptoPulse Alerts'
                 )
                 send_via_gmail(subject, body, email)
                 triggered.append({'coin_id': coin_id, 'email': email, 'score': score})
