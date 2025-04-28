@@ -3,7 +3,6 @@ import pytest
 import sys
 from unittest.mock import patch, MagicMock
 
-
 praw_mock = MagicMock()
 praw_reddit_mock = MagicMock()
 praw_reddit_mock.user.me.return_value = "mock_user"

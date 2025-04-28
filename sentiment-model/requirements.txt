@@ -1,2 +1,5 @@
 Flask==2.3.3
 nltk==3.8.1
+transformers
+numpy
+torch
