@@ -45,7 +45,14 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 - GitHub Actions - CI/CD Pipelines
 - Google Cloud Run | Amazon Cloudfront - Deployment Platform
 
+## The Team 👥
+- Rishiraj Paul Chowdhury
+- Pavan Sai Appari
+- Sri Harsha Vallabhaneni
+- Sai Gautham Ghanta
+- Heera Menon 
 
-
+## Appendix
+Presentation: 
 
 
