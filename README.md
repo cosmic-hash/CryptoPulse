@@ -39,13 +39,13 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 
 ## Built With ☁️
 - React.js - Frontend Framework
-- Reddit & Twitter & News CryptoPanic dump - Data Collection
+- Reddit | Twitter | News CryptoPanic dump - Data Collection
 - Firebase Authentication - Login Authenticator 
-- Go & Flask & OpenAI - Backend Aggregator Service
-- VADER & BERT - Sentiment Analysis Models
+- Go | Flask | OpenAI - Backend Aggregator Service
+- VADER | BERT - Sentiment Analysis Models
 - Docker - Containerization
 - GitHub Actions - CI/CD Pipelines
-- Google Cloud Run & Amazon Cloudfront - Deployment Platform
+- Google Cloud Run | Amazon Cloudfront - Deployment Platform
 
 
 
