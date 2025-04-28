@@ -20,7 +20,6 @@ DB_CONFIG = {
 }
 
 def get_db_connection():
-    print("Creating DB connection...")
     return psycopg2.connect(**DB_CONFIG)
 
 # Sentiment API integration
