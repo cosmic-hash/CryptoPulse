@@ -1,2 +1,2 @@
 # CryptoPulse
-# frontend
+## Your Crypto-Invest Mate
