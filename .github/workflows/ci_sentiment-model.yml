@@ -3,8 +3,10 @@ name: Run Sentiment-Model Tests
 on:
   push:
     branches:
+      - main
   pull_request:
     branches:
+      - main
 
 jobs:
   test:
