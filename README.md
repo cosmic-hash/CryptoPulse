@@ -20,14 +20,12 @@ CryptoPulse bridges this gap by fetching, analyzing, and visualizing crypto-rela
 ## Roadblocks We Crushed 🛤
 - API Limits: Designed smart retry and batching strategies to fetch large data volumes efficiently.
 - Twitter Limitations: Shifted focus to Reddit, ensuring strong sentiment signals without extra costs.
-- Live Topic Synthesis: Condensed real-time discussions to reveal the key drivers behind observed sentiment.
+- Topic Insights:: Condensed real-time discussions to reveal the key drivers behind observed sentiment.
 - Custom Sentiment Aggregator: Developed a custom algorithm that runs targeted search queries, aggregates fetched messages with unique logic, and calculates an overall sentiment score.
-- Historical News Analysis: Open source news dump analysis on both VADER and BERT models for sentiment calculation and historical discrete data plotting.
--  Real-Time Alerts: Instantly notify users of sentiment changes for any coin.
+- Historical News Analysis: Open source news dump analysis by batching on both VADER and BERT models for 170k+ points to get sentiment calculation and historical discrete data plotting.
 - Crypto Slang: Used sentiment models tuned to social-media for better understanding crypto conversations.
-- Data Bursts: Optimized database writes and handled bulk inserts without downtime.
+- Data Bursts: Optimized database writes and handled bulk inserts without downtime using connection pooling
 - Deployment Complexity: Streamlined multi-service tests & deployments using Docker and CI/CD pipelines.
-
 
 ## Next Steps 💸
 - Expand to support multi-language sentiment analysis.
