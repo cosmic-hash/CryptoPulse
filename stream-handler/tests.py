@@ -1,14 +1,15 @@
 from datetime import datetime, timezone
 import pytest
+import sys
 from unittest.mock import patch, MagicMock
 
-@pytest.fixture(autouse=True)
-def mock_reddit():
-    with patch('fetch_posts.praw.Reddit') as mock_reddit_class:
-        mock_reddit_instance = MagicMock()
-        mock_reddit_instance.user.me.return_value = "mock_user"
-        mock_reddit_class.return_value = mock_reddit_instance
-        yield
+
+praw_mock = MagicMock()
+praw_reddit_mock = MagicMock()
+praw_reddit_mock.user.me.return_value = "mock_user"
+praw_mock.Reddit.return_value = praw_reddit_mock
+
+sys.modules['praw'] = praw_mock
 
 @pytest.fixture(autouse=True)
 def mock_db_connection():
