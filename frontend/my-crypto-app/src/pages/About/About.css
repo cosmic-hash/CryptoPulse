@@ -1,115 +1,92 @@
-.about {
-    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-    padding: 2.5rem 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    margin: 2rem auto;
-    max-width: 1400px; /* ✅ increased from 1300px to 1400px */
+/* Base styles - Dark Futuristic Theme */
+.about-page {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    width: 100%;
+    padding: 3rem 1.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
-.about h2 {
+/* Optional: Add subtle polygon background */
+.about-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23334155' fill-opacity='0.05' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'%3E%3C/path%3E%3C/svg%3E");
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.about-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    color: #e0e7ff;
+    position: relative;
+    z-index: 1;
+}
+
+/* Heading styles with enhanced animations - SMALLER FONT */
+.about-content h2 {
     text-align: center;
-    font-size: 2.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    background: linear-gradient(to right, #6366f1, #ec4899);
+    font-size: 2.4rem; /* REDUCED from 3rem */
+    font-weight: 800;
+    margin-bottom: 2rem; /* REDUCED from 2.5rem */
+    background: linear-gradient(120deg, #b829f7, #00fff9, #b829f7);
+    background-size: 200% auto;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: gradientFlow 6s infinite linear;
+    letter-spacing: -0.025em;
+    position: relative;
+    padding-bottom: 0.75rem; /* REDUCED from 1rem */
 }
 
-.about p {
+.about-content h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px; /* REDUCED from 120px */
+    height: 2px; /* REDUCED from 3px */
+    background: linear-gradient(to right, rgba(184, 41, 247, 0), rgba(0, 255, 249, 1), rgba(184, 41, 247, 0));
+    border-radius: 2px;
+}
+
+.about-content p {
     text-align: center;
-    font-size: 1rem;
-    color: #4b5563;
-    max-width: 700px;
-    margin: 0 auto 2rem;
+    font-size: 1rem; /* REDUCED from 1.2rem */
+    color: #a5b4fc;
+    max-width: 800px;
+    margin: 0 auto 2.5rem; /* REDUCED from 3.5rem */
+    line-height: 1.7; /* REDUCED from 1.8 */
+    animation: fadeIn 1s ease-out;
+    text-shadow: 0 0 30px rgba(0, 255, 249, 0.1);
 }
 
-.developers-heading {
-    margin-top: 3rem;
-    font-size: 1.8rem;
-    font-weight: 700;
-    text-align: center;
-    color: #111827;
-}
-
-.developers-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    justify-content: center;
-    margin-top: 2rem;
-}
-
-.developer-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 14px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    width: 220px; /* ✅ smaller safe width */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    min-height: 280px;
-}
-
-.developer-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
-}
-
-.developer-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    border: 3px solid #6366f1;
-}
-
-.developer-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #1f2937;
-}
-
-.developer-email {
-    font-size: 0.85rem;
-    color: #10b981;
-    margin-bottom: 1rem;
-}
-
-.linkedin-button {
-    display: inline-block;
-    padding: 0.4rem 1rem;
-    background: linear-gradient(to right, #0077b5, #005582);
-    color: white;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.3s ease;
-    font-size: 0.9rem;
-}
-
-.linkedin-button:hover {
-    background: linear-gradient(to right, #005582, #003d66);
-}
-
+/* Architecture section with improved visuals - MORE COMPACT */
 .architecture-section {
-    margin: 4rem 0;
+    margin: 3.5rem 0; /* REDUCED from 5rem */
     text-align: center;
+    animation: slideUp 0.8s ease-out both;
 }
 
 .architecture-section h3 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
-    background: linear-gradient(to right, #06b6d4, #6366f1);
+    font-size: 1.8rem; /* REDUCED from 2.4rem */
+    font-weight: 700;
+    margin-bottom: 2rem; /* REDUCED from 2.5rem */
+    background: linear-gradient(to right, #00fff9, #b829f7);
+    background-size: 200% auto;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    letter-spacing: -0.025em;
 }
 
 .architecture-image-wrapper {
@@ -117,36 +94,302 @@
     max-width: 900px;
     margin: 0 auto;
     overflow: hidden;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-radius: 16px; /* REDUCED from 20px */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 255, 249, 0.15);
+    position: relative;
+    border: 1px solid rgba(0, 255, 249, 0.2);
+}
+
+.architecture-image-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00fff9, transparent);
+    animation: scanline 4s linear infinite;
+    z-index: 2;
 }
 
 .architecture-image-wrapper img {
     width: 100%;
     height: auto;
     object-fit: contain;
-    border-radius: 16px;
+    border-radius: 16px; /* REDUCED from 20px */
+    transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    filter: drop-shadow(0 0 8px rgba(0, 255, 249, 0.1));
+    display: block;
 }
 
-/* Responsive */
+.architecture-image-wrapper:hover img {
+    transform: scale(1.02); /* REDUCED from 1.03 */
+    filter: drop-shadow(0 0 12px rgba(0, 255, 249, 0.3));
+}
+
+/* Team section with improved cards - SMALLER CARDS IN ONE ROW */
+.developers-heading {
+    margin-top: 3.5rem; /* REDUCED from 5rem */
+    font-size: 1.8rem; /* REDUCED from 2.4rem */
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(120deg, #f472b6, #60a5fa);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientFlow 6s infinite linear;
+    letter-spacing: -0.025em;
+    margin-bottom: 2rem; /* REDUCED from 3rem */
+}
+
+/* MODIFIED: Force single row with equal widths */
+.developers-container {
+    display: flex;
+    flex-wrap: nowrap; /* Forces single row */
+    justify-content: center;
+    gap: 1.25rem; /* REDUCED from 2.5rem */
+    margin-top: 2rem; /* REDUCED from 3rem */
+    overflow-x: auto; /* Allow horizontal scroll on small screens */
+    padding-bottom: 1rem; /* Space for potential scrollbar */
+}
+
+/* SMALLER, MORE COMPACT DEVELOPER CARDS */
+.developer-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 1.25rem; /* REDUCED from 1.75rem */
+    border-radius: 14px; /* REDUCED from 18px */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    width: 250px; /* REDUCED from 250px */
+    min-height: 300px; /* REDUCED from 340px */
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    border: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    flex: 1; /* Each card takes equal width */
+    min-width: 220px; /* INCREASED from 175px */
+    max-width: 240px; /* Minimum width */
+}
+
+.developer-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 255, 249, 0.1), rgba(184, 41, 247, 0.05));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+}
+
+.developer-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00fff9, transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.developer-card:hover {
+    transform: translateY(-8px) scale(1.02); /* REDUCED from translateY(-10px) scale(1.03) */
+    background: rgba(51, 65, 85, 0.7);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 255, 249, 0.2);
+    border-color: rgba(0, 255, 249, 0.3);
+}
+
+.developer-card:hover::before {
+    opacity: 1;
+}
+
+.developer-card:hover::after {
+    transform: translateX(0);
+}
+
+/* SMALLER PROFILE IMAGES */
+.developer-image {
+    width: 80px; /* REDUCED from 105px */
+    height: 80px; /* REDUCED from 105px */
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem; /* REDUCED from 1.5rem */
+    border: 2px solid transparent; /* REDUCED from 3px */
+    background: linear-gradient(#1e293b, #1e293b) padding-box,
+    linear-gradient(135deg, #00fff9, #b829f7) border-box;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.developer-card:hover .developer-image {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(0, 255, 249, 0.3);
+}
+
+/* SMALLER FONT SIZES */
+.developer-name {
+    font-size: 0.95rem; /* REDUCED from 1.25rem */
+    font-weight: 700;
+    margin-bottom: 0.4rem; /* REDUCED from 0.5rem */
+    color: #f9fafb;
+    width: 100%;
+    /*word-break: break-word;*/
+    position: relative;
+    z-index: 1;
+    letter-spacing: -0.01em;
+}
+
+.developer-email {
+    font-size: 0.75rem;
+    color: #00f7ff;
+    /*margin-bottom: 1rem;*/
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+    align-items: start;
+    white-space: nowrap; /* NEW: prevent line break */
+    overflow-x: auto; /* NEW: allow scrolling if needed */
+    width: 100%;
+}
+
+
+/* SMALLER BUTTON */
+.linkedin-button {
+    padding: 0.4rem 1rem; /* REDUCED from 0.5rem 1.25rem */
+    background: linear-gradient(135deg, #3b82f6, #9333ea);
+    color: white;
+    border-radius: 6px; /* REDUCED from 8px */
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.8rem; /* REDUCED from 0.9rem */
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 3px 8px rgba(147, 51, 234, 0.3);
+    display: inline-block;
+    /*margin-top: 0.4rem; !* REDUCED from 0.5rem *!*/
+}
+
+.linkedin-button:hover {
+    background: linear-gradient(135deg, #4f46e5, #ec4899);
+    transform: translateY(-2px); /* REDUCED from -3px */
+    box-shadow: 0 5px 12px rgba(147, 51, 234, 0.4);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes scanline {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Responsive adjustments - ADJUSTED FOR SMALLER CARDS */
 @media (max-width: 1200px) {
+    .about-content h2 {
+        font-size: 2.2rem;
+    }
+
+    .architecture-section h3,
+    .developers-heading {
+        font-size: 1.6rem;
+    }
+
+    /* Allow horizontal scroll on medium screens */
+    .developers-container {
+        justify-content: flex-start;
+        padding-bottom: 1rem;
+    }
+}
+
+@media (max-width: 992px) {
+    /* Force wrapping on small screens */
+    .developers-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
     .developer-card {
-        width: 200px;
+        flex: 0 0 auto;
+        width: calc(33.33% - 1rem);
+        min-width: 160px;
     }
 }
 
 @media (max-width: 768px) {
-    .developers-container {
-        flex-direction: column;
-        align-items: center;
+    .about-content h2 {
+        font-size: 1.8rem;
+    }
+
+    .about-content p {
+        font-size: 0.95rem;
+    }
+
+    .architecture-section h3,
+    .developers-heading {
+        font-size: 1.5rem;
     }
 
     .developer-card {
-        width: 100%;
-        max-width: 300px;
+        width: calc(50% - 1rem);
     }
+}
 
-    .architecture-section h3 {
-        font-size: 1.6rem;
+@media (max-width: 576px) {
+    .developer-card {
+        width: 100%;
+        max-width: 220px;
     }
+}
+
+/* Staggered animation for developer cards */
+.developer-card:nth-child(1) { animation: fadeIn 0.5s ease-out 0.1s both; }
+.developer-card:nth-child(2) { animation: fadeIn 0.5s ease-out 0.2s both; }
+.developer-card:nth-child(3) { animation: fadeIn 0.5s ease-out 0.3s both; }
+.developer-card:nth-child(4) { animation: fadeIn 0.5s ease-out 0.4s both; }
+.developer-card:nth-child(5) { animation: fadeIn 0.5s ease-out 0.5s both; }
+
+/* Custom scrollbar for the developer container */
+.developers-container::-webkit-scrollbar {
+    height: 5px;
+}
+
+.developers-container::-webkit-scrollbar-track {
+    background: #1e293b;
+    border-radius: 10px;
+}
+
+.developers-container::-webkit-scrollbar-thumb {
+    background: #00fff9;
+    border-radius: 10px;
+}
+
+.developers-container::-webkit-scrollbar-thumb:hover {
+    background: #b829f7;
 }

@@ -116,7 +116,12 @@ const Header: React.FC = () => {
     return (
         <header
             className={`p-4 border-b ${'border-pink-700'} ${'bg-gray-900 text-pink-300'} flex justify-between items-center`}>
-            <div className="text-3xl font-bold tracking-widest">CRYPTO PULSE</div>
+            <div className="flex items-center gap-2 text-3xl font-bold tracking-widest">
+                <img src="/images/cryptopulse-icon.svg" alt="CryptoPulse" className="w-8 h-8"/>
+                <Link to="/" className="text-gradient">
+                    CRYPTO PULSE
+                </Link>
+            </div>
             <div className="flex items-center gap-4">
                 <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                     Dashboard
@@ -130,69 +135,17 @@ const Header: React.FC = () => {
 
                 {!loading && (user ? (
                     <button className="p-2" onClick={handleLogout}>
-                        <LogOut className="text-pink-300"/>
+                        <LogOut className="text-[#00fff9] transition" />
                     </button>
                 ) : (
                     <button className="p-2" onClick={handleLogin}>
-                        <span className="text-pink-300 font-bold">Login</span>
+                        <span className="text-[#00fff9] font-bold">Login</span>
                     </button>
                 ))}
             </div>
         </header>
 
-        // <header className="header">
-        //     <h1 className="logo">CryptoPulse</h1>
-        //     <nav className="nav">
-        //         <div className="nav-links">
-        //             <Link
-        //                 to="/"
-        //                 className={location.pathname === '/' ? 'active' : ''}
-        //             >
-        //                 Dashboard
-        //             </Link>
-        //             <Link
-        //                 to="/about"
-        //                 className={location.pathname === '/about' ? 'active' : ''}
-        //             >
-        //                 About
-        //             </Link>
-        //         </div>
 
-        //         <div className="auth-section">
-        //             {!loading && (
-        //                 userProfile ? (
-        //                     <div
-        //                         className="profile-dropdown"
-        //                         onClick={() => setDropdownOpen(prev => !prev)}
-        //                         ref={dropdownRef}
-        //                     >
-        //                         <img
-        //                             src={userProfile.picture}
-        //                             alt="Profile"
-        //                             className="profile-pic"
-        //                         />
-        //                         <span className="user-name">
-        //             {userProfile.name}
-        //                             <span className={`dropdown-icon ${dropdownOpen ? 'open' : ''}`}>▼</span>
-        //         </span>
-        //                         {dropdownOpen && (
-        //                             <div className="dropdown-menu">
-        //                                 <div className="dropdown-email">{userProfile.email}</div>
-        //                                 <button className="logout-btn" onClick={handleLogout}>
-        //                                     Logout
-        //                                 </button>
-        //                             </div>
-        //                         )}
-        //                     </div>
-        //                 ) : (
-        //                     <button className="login-link" onClick={handleLogin}>
-        //                         Login
-        //                     </button>
-        //                 )
-        //             )}
-        //         </div>
-        //     </nav>
-        // </header>
     );
 };
 
