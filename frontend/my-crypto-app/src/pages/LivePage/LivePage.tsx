@@ -13,7 +13,7 @@ const EXPLAIN_API_URL = 'https://crypto-pulse-1-546660857332.us-central1.run.app
 
 const fullCoinNames = [
     'Bitcoin', 'Ethereum', 'Tether', 'Ripple', 'Binance',
-    'Solana', 'CryptoCurrency', 'Tronix', 'Dogecoin', 'Cardano'
+    'Solana', 'USDC', 'Tronix', 'Dogecoin', 'Cardano'
 ];
 
 const coinNameToSymbol: Record<string, string> = {
@@ -23,7 +23,7 @@ const coinNameToSymbol: Record<string, string> = {
     Ripple: 'XRP',
     Binance: 'BNB',
     Solana: 'SOL',
-    CryptoCurrency: 'USDC',
+    USDC: 'USDC',
     Tronix: 'TRX',
     Dogecoin: 'DOGE',
     Cardano: 'ADA',

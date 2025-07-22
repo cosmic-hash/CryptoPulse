@@ -25,7 +25,7 @@ const { Title } = Typography;
 
 const allCoins = [
     'Bitcoin', 'Ethereum', 'Tether', 'Ripple', 'Binance',
-    'Solana', 'CryptoCurrency', 'Tronix', 'Dogecoin', 'Cardano'
+    'Solana', 'USDC', 'Tronix', 'Dogecoin', 'Cardano'
 ];
 
 const coinColors = [
@@ -129,7 +129,7 @@ const SentimentChart: React.FC = () => {
         XRP: "Ripple",
         BNB: "Binance",
         SOL: "Solana",
-        USDC: "CryptoCurrency",
+        USDC: "USDC",
         TRX: "Tronix",
         DOGE: "Dogecoin",
         ADA: "Cardano",
